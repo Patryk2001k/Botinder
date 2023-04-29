@@ -1,0 +1,22 @@
+{% extends 'main.html' %}
+{% block link %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css_files/FAQ.css') }}">
+{% endblock %}
+{% block center %}
+<div class="container">
+    <div class="main-header">
+        <h1>Witaj w sekcji FAQ</h1>
+    </div>
+    <div class="FAQ-section">
+        <div class="FAQ-question">
+            <h2>Pierwsze pytanie FAQ</h2>
+            <p class="answer">Odpowiedź na pytanie FAQ</p>
+        </div>
+        <div class="FAQ-question">
+            <h2>Drugie pytanie FAQ</h2>
+            <p class="answer">Odpowiedź na drugie pytanie FAQ</p>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='javascript_files/FAQ.js') }}"></script>
+{% endblock %}
