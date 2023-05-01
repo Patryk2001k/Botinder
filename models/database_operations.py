@@ -1,6 +1,7 @@
 from models import database
 from app import bcrypt
-from models.database import Session
+from models.database import User, sessionmaker, engine
+Session = sessionmaker(bind=engine)
 
 def user_in_database(name, password):
     session = Session()
@@ -9,6 +10,8 @@ def user_in_database(name, password):
     
     if user_password is not None:
         check_password = bcrypt.check_password_hash(user_password[0], password)
+
+    session.close()
 
     if user_exists and check_password:
         return True
@@ -58,7 +61,17 @@ def insert_into_robots_db(name, type_of_robot, profile_description, domicile, pr
         )
         session_1.add(robot_profile)
         session_1.commit() 
+        session_1.close()
 
 def select_all_from_database(model_class):
      session_2 = Session()
-     return session_2.query(model_class).all()
+     all_information_from_db = session_2.query(model_class).all()
+     session_2.close()
+     return all_information_from_db
+
+def get_user_from_User_table(user):
+     session_3 = Session()
+     selected_user = session_3.query(User).filter_by(name=user).first()
+     session_3.close()
+     return selected_user
+

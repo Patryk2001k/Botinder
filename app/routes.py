@@ -1,21 +1,31 @@
-from app import app, bcrypt
+from app import app, login_manager
 from flask import render_template, redirect, url_for, session
 from models.forms import LoginForm, RegistrationForm, AdminForm, UserCriteria, UserProfileForm
 from models.database_operations import (
     user_in_database,
     select_all_from_database,
     insert_user_and_user_profile,
-    insert_into_robots_db
+    insert_into_robots_db,
+    get_user_from_User_table
 )
 from models.database import User, UserRobot, RobotProfile
+from flask_login import UserMixin, login_user, logout_user, login_required, current_user
+
+class User(UserMixin):
+    pass
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
+
 
 site_session = session
 
 @app.route("/")
 @app.route("/home")
 def home():
-    username = site_session.get('logged_username')
-    if username:
+    logout_user()
+    if current_user.is_authenticated:
         return redirect(url_for("user_homepage"))
     else:
         return render_template("start-page.html")
@@ -41,8 +51,9 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         if user_in_database(form.name.data, form.password.data):
-            site_session["logged_username"] = form.name.data
-            print(select_all_from_database(User))
+            user = get_user_from_User_table(form.name.data)
+            login_user(user)
+            print(current_user.name)
             return redirect(url_for("user_homepage"))
         
         elif form.name.data == "admin" and form.name.data == "admin":
@@ -97,8 +108,14 @@ def user_criteria():
         education = site_session.get("education")
         employment_status = site_session.get("employment_status")
 
+        
         insert_user_and_user_profile(name, lastname, password, email, age, gender, profile_description, domicile, education, employment_status)    
+        
+        user = get_user_from_User_table(name)
 
+        login_user(user)
+        
+        print(current_user)
         print(form.data)
         
         return redirect(url_for("user_homepage"))
@@ -106,12 +123,9 @@ def user_criteria():
 
 @app.route("/user_homepage")
 def user_homepage():
-    logged_user = site_session.get("logged_username")
-    registered_user = site_session.get("name")
-    if logged_user:
-        return render_template("user_homepage.html", user=logged_user)
-    elif registered_user:
-        return render_template("user_homepage.html", user=registered_user)
+    print(current_user.name)
+    if current_user.is_authenticated:
+        return render_template("user_homepage.html", user=current_user.name)
 
 @app.route("/admin_site", methods=["GET", "POST"])
 def admin_site():
@@ -133,8 +147,10 @@ def admin_site():
     return render_template("admin-site.html", form=form)
 
 @app.route("/logout", methods=["GET", "POST"])
+@login_required
 def logout():
-    site_session.pop("logged_username", None)
+    print(current_user.name)
+    logout_user()
     return redirect(url_for("home"))
 
 
