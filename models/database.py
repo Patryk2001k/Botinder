@@ -198,3 +198,4 @@ session = Session()
     #new_message = Messages(username=new_user.username, email=new_user.email, message=message, author=new_user)
     #session.add(new_message)
     #session.commit()
+    

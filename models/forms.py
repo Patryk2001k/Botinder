@@ -72,3 +72,4 @@ class AdminForm(FlaskForm):
     domicile = StringField("domicile", validators=[DataRequired()])
 
     submit_field = SubmitField("Submit")
+    
