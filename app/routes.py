@@ -146,6 +146,7 @@ def admin_site():
         return render_template("admin-site.html", form=form, message="Udało się dodać użytkownika")
     return render_template("admin-site.html", form=form)
 
+
 @app.route("/logout", methods=["GET", "POST"])
 @login_required
 def logout():

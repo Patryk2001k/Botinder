@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import BooleanField, PasswordField, StringField, SubmitField, IntegerField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
@@ -72,4 +73,9 @@ class AdminForm(FlaskForm):
     domicile = StringField("domicile", validators=[DataRequired()])
 
     submit_field = SubmitField("Submit")
+
+class UploadForm(FlaskForm):
+    photo = FileField(validators=[FileAllowed(["jpg", "jpeg", "png"], "only images allowed"), 
+                             FileRequired("File field should be empty")])
+    submit = SubmitField("Upload")
     
