@@ -14,3 +14,5 @@ To this project i used frameworks like:
 - flask_uploads
 - os library to create folders for current users and store images
 - Bcrypt to hash password
+- of course i use basic stuff like HTML, CSS, JS and jinja2 
+- alpine.js (i used this js framework to simple stuff with html, in shortcut this framework can do dynamic html in simple way and i think it is good for small projects)
