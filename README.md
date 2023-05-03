@@ -7,7 +7,7 @@ App must be:
 - connect people with robots 
 - people and robots can send messages with each other
 
-To this project i used frameworks like:
+To this project i used frameworks and technologies like:
 - sqlalchemy (to store information in database)
 - flask (simple python web framework)
 - flask_login (and everything with login_authentication)
