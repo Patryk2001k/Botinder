@@ -1,6 +1,6 @@
 from app import app, login_manager
 from flask import render_template, redirect, url_for, session
-from models.forms import LoginForm, RegistrationForm, AdminForm, UserCriteria, UserProfileForm
+from models.forms import LoginForm, RegistrationForm, AdminForm, UserCriteria, UserProfileForm, UploadForm
 from models.database_operations import (
     user_in_database,
     select_all_from_database,
@@ -10,6 +10,7 @@ from models.database_operations import (
 )
 from models.database import User, UserRobot, RobotProfile
 from flask_login import UserMixin, login_user, logout_user, login_required, current_user
+from app.get_image import get_image
 
 class User(UserMixin):
     pass
@@ -96,6 +97,13 @@ def user_profile():
 @app.route("/user_criteria", methods=["GET", "POST"])
 def user_criteria():
     form = UserCriteria()
+    if form.validate_on_submit():      
+       return redirect(url_for("get_main_image"))
+    return render_template("user-criteria-form.html", form=form)
+
+@app.route("/get_main_image", methods=["GET", "POST"])
+def get_main_image():
+    form = UploadForm()
     if form.validate_on_submit():
         name = site_session.get("name")
         lastname = site_session.get("lastname")
@@ -114,14 +122,14 @@ def user_criteria():
         user = get_user_from_User_table(name)
 
         login_user(user)
-        
-        print(current_user)
-        print(form.data)
+
+        get_image(form.photo.data)
         
         return redirect(url_for("user_homepage"))
-    return render_template("user-criteria-form.html", form=form)
+    return render_template("get-main-image.html", form=form)
 
 @app.route("/user_homepage")
+@login_required
 def user_homepage():
     print(current_user.name)
     if current_user.is_authenticated:

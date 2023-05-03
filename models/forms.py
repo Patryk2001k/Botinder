@@ -77,5 +77,5 @@ class AdminForm(FlaskForm):
 class UploadForm(FlaskForm):
     photo = FileField(validators=[FileAllowed(["jpg", "jpeg", "png"], "only images allowed"), 
                              FileRequired("File field should be empty")])
-    submit = SubmitField("Upload")
+    submit_field = SubmitField("Submit")
     

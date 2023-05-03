@@ -1,0 +1,17 @@
+        name = site_session.get("name")
+        lastname = site_session.get("lastname")
+        email = site_session.get("email")
+        password = site_session.get("password")
+        age = site_session.get("age")
+        gender = site_session.get("gender")
+        profile_description = site_session.get("profile_description")
+        domicile = site_session.get("domicile")
+        education = site_session.get("education")
+        employment_status = site_session.get("employment_status")
+
+        
+        insert_user_and_user_profile(name, lastname, password, email, age, gender, profile_description, domicile, education, employment_status)    
+        
+        user = get_user_from_User_table(name)
+
+        login_user(user)

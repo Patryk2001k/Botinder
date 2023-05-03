@@ -5,15 +5,16 @@ Session = sessionmaker(bind=engine)
 
 def user_in_database(name, password):
     session = Session()
-    user_exists = session.query(database.exists().where(database.User.name == name)).scalar()
+    #user_exists = session.query(database.exists().where(database.User.name == name)).scalar()
     user_password = session.query(database.User.password).filter_by(name=name).first()
+    check_password = ""
     
     if user_password is not None:
         check_password = bcrypt.check_password_hash(user_password[0], password)
 
     session.close()
 
-    if user_exists and check_password:
+    if check_password:
         return True
     else:
         return False
