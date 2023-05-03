@@ -25,7 +25,6 @@ site_session = session
 @app.route("/")
 @app.route("/home")
 def home():
-    logout_user()
     if current_user.is_authenticated:
         return redirect(url_for("user_homepage"))
     else:
