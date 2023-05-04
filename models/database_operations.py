@@ -1,6 +1,6 @@
 from models import database
 from app import bcrypt
-from models.database import User, sessionmaker, engine
+from models.database import User, sessionmaker, engine, UserCriteria
 Session = sessionmaker(bind=engine)
 
 def user_in_database(name, password):
@@ -20,7 +20,8 @@ def user_in_database(name, password):
         return False
 
 
-def insert_user_and_user_profile(name, lastname, password, email, age, gender, profile_description, domicile, education, employment_status):
+def insert_user_and_user_profile(name, lastname, password, email, age, gender, profile_description, domicile, education, 
+                                 employment_status, type_of_robot, distance, employment_status_criteria):
         session = Session()
         
         hashed_password = bcrypt.generate_password_hash(password)
@@ -37,8 +38,18 @@ def insert_user_and_user_profile(name, lastname, password, email, age, gender, p
             employment_status=employment_status,
             user=user
         )
+
+        criteria = UserCriteria(
+             type_of_robot=type_of_robot,
+             distance=distance,
+             employment_status=employment_status_criteria,
+             user=user
+        )
+
         session.add(profile)
+        session.add(criteria)
         session.commit()
+
         session.close()
 
 def insert_into_user_criteria_db():

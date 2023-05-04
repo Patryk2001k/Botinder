@@ -96,7 +96,11 @@ def user_profile():
 @app.route("/user_criteria", methods=["GET", "POST"])
 def user_criteria():
     form = UserCriteria()
-    if form.validate_on_submit():      
+    if form.validate_on_submit():
+       site_session["type_of_robot"] = form.type_of_robot.data
+       site_session["distance"] = form.distance.data
+       site_session["employment_status_criteria"] = form.employment_status.data
+
        return redirect(url_for("get_main_image"))
     return render_template("user-criteria-form.html", form=form)
 
@@ -114,16 +118,35 @@ def get_main_image():
         domicile = site_session.get("domicile")
         education = site_session.get("education")
         employment_status = site_session.get("employment_status")
+        type_of_robot = site_session.get("type_of_robot")
+        distance = site_session.get("distance")
+        employment_status_criteria = site_session.get("employment_status_criteria")
 
         
-        insert_user_and_user_profile(name, lastname, password, email, age, gender, profile_description, domicile, education, employment_status)    
+        insert_user_and_user_profile(name, lastname, password, email, age, gender, profile_description, domicile, education, employment_status,
+                                     type_of_robot, distance, employment_status_criteria)    
         
         user = get_user_from_User_table(name)
 
         login_user(user)
 
         get_image(form.photo.data)
-        
+
+        session.pop("name", None)
+        session.pop("lastname", None)
+        session.pop("email", None)
+        session.pop("password", None)
+        session.pop("age", None)
+        session.pop("gender", None)
+        session.pop("profile_description", None)
+        session.pop("domicile", None)
+        session.pop("education", None)
+        session.pop("employment_status", None)
+        session.pop("type_of_robot", None)
+        session.pop("distance", None)
+        session.pop("employment_status_criteria", None)
+        print(distance)
+
         return redirect(url_for("user_homepage"))
     return render_template("get-main-image.html", form=form)
 
