@@ -1,4 +1,4 @@
-from app import app, login_manager
+from app import app, login_manager, cipher_suite
 from flask import render_template, redirect, url_for, session, request
 from models.forms import LoginForm, RegistrationForm, AdminForm, UserCriteria, UserProfileForm, UploadForm
 from models.database_operations import (
@@ -25,6 +25,12 @@ site_session = session
 @app.route("/")
 @app.route("/home")
 def home():
+    x = cipher_suite.encrypt(b"my password")
+    plain_text = cipher_suite.decrypt(x)
+    decoded = plain_text.decode("utf-8")
+    print(decoded)
+    print(type(decoded))
+
     if current_user.is_authenticated:
         return redirect(url_for("user_homepage"))
     else:
@@ -39,10 +45,11 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         if not user_in_database(form.name.data, form.password.data):
+            user_password = form.password.data
             site_session['name'] = form.name.data
             site_session['lastname'] = form.lastname.data
             site_session['email'] = form.email.data
-            site_session['password'] = form.password.data
+            site_session['password'] = cipher_suite.encrypt(user_password.encode())
             return redirect(url_for("user_profile"))
     return render_template("register_form.html", form=form)
 
@@ -111,7 +118,11 @@ def get_main_image():
         name = site_session.get("name")
         lastname = site_session.get("lastname")
         email = site_session.get("email")
+        
         password = site_session.get("password")
+        user_password_decrypted = cipher_suite.decrypt(password)
+        user_password_decoded = user_password_decrypted.decode("utf-8")
+
         age = site_session.get("age")
         gender = site_session.get("gender")
         profile_description = site_session.get("profile_description")
@@ -123,7 +134,7 @@ def get_main_image():
         employment_status_criteria = site_session.get("employment_status_criteria")
 
         
-        insert_user_and_user_profile(name, lastname, password, email, age, gender, profile_description, domicile, education, employment_status,
+        insert_user_and_user_profile(name, lastname, user_password_decoded, email, age, gender, profile_description, domicile, education, employment_status,
                                      type_of_robot, distance, employment_status_criteria)    
         
         user = get_user_from_User_table(name)
@@ -159,9 +170,6 @@ def user_homepage():
 @app.route("/admin_site", methods=["GET", "POST"])
 def admin_site():
     form = AdminForm()
-    print(request.method)
-    if request.method == "POST":
-        print(request.form)
     if form.validate_on_submit():
         print(form.name.data)
         print(form.type_of_robot.data)
@@ -173,9 +181,9 @@ def admin_site():
             form.procesor_unit.data,
             form.employment_status.data
         )
-        #select_all_from_database(UserRobot)
+        print(select_all_from_database(UserRobot))
         print("-----------")
-        #select_all_from_database(RobotProfile)
+        print(select_all_from_database(RobotProfile))
 
         get_image(form.photo.data, form.name.data, "robots")
 
@@ -189,5 +197,6 @@ def logout():
     print(current_user.name)
     logout_user()
     return redirect(url_for("home"))
+
 
 
