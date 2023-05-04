@@ -56,7 +56,7 @@ def login():
             print(current_user.name)
             return redirect(url_for("user_homepage"))
         
-        elif form.name.data == "admin" and form.name.data == "admin":
+        elif form.name.data == "admin" and form.password.data == "admin@42141412admin":
             return redirect(url_for("admin_site"))
 
         else:
