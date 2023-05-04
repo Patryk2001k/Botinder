@@ -72,6 +72,9 @@ class AdminForm(FlaskForm):
 
     domicile = StringField("domicile", validators=[DataRequired()])
 
+    photo = FileField(validators=[FileAllowed(["jpg", "jpeg", "png"], "only images allowed"), 
+                             FileRequired("File field should be empty")])
+
     submit_field = SubmitField("Submit")
 
 class UploadForm(FlaskForm):

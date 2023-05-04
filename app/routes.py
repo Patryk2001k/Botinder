@@ -1,5 +1,5 @@
 from app import app, login_manager
-from flask import render_template, redirect, url_for, session
+from flask import render_template, redirect, url_for, session, request
 from models.forms import LoginForm, RegistrationForm, AdminForm, UserCriteria, UserProfileForm, UploadForm
 from models.database_operations import (
     user_in_database,
@@ -145,7 +145,6 @@ def get_main_image():
         session.pop("type_of_robot", None)
         session.pop("distance", None)
         session.pop("employment_status_criteria", None)
-        print(distance)
 
         return redirect(url_for("user_homepage"))
     return render_template("get-main-image.html", form=form)
@@ -160,8 +159,12 @@ def user_homepage():
 @app.route("/admin_site", methods=["GET", "POST"])
 def admin_site():
     form = AdminForm()
+    print(request.method)
+    if request.method == "POST":
+        print(request.form)
     if form.validate_on_submit():
-        print(form.data)
+        print(form.name.data)
+        print(form.type_of_robot.data)
         insert_into_robots_db(
             form.name.data,
             form.type_of_robot.data,
@@ -170,9 +173,12 @@ def admin_site():
             form.procesor_unit.data,
             form.employment_status.data
         )
-        select_all_from_database(UserRobot)
+        #select_all_from_database(UserRobot)
         print("-----------")
-        select_all_from_database(RobotProfile)
+        #select_all_from_database(RobotProfile)
+
+        get_image(form.photo.data, form.name.data, "robots")
+
         return render_template("admin-site.html", form=form, message="Udało się dodać użytkownika")
     return render_template("admin-site.html", form=form)
 
