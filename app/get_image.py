@@ -23,9 +23,10 @@ def get_image(photo, name="", url_path="users"):
     if file_ext not in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
         return "Nieprawidłowe rozszerzenie pliku"
     photo.save(os.path.join(app.config["UPLOADED_PHOTOS_DEST"], filename))
+    return filename
     #file_url = url_for("get_file", filename=filename)
 
 
-@app.route("/uploads/<filename>", methods=["GET", "POST"])
-def get_file(filename):
-    return send_from_directory(app.config["UPLOADED_PHOTOS_DEST"], filename)
+#@app.route("/uploads/<filename>", methods=["GET", "POST"])
+#def get_file(filename):
+#    return send_from_directory(app.config["UPLOADED_PHOTOS_DEST"], filename)

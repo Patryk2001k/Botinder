@@ -20,12 +20,11 @@ def user_in_database(name, password):
         return False
 
 
-def insert_user_and_user_profile(name, lastname, password, email, age, gender, profile_description, domicile, education, 
+def insert_user_and_user_profile(name, lastname, password, email, image_file, age, gender, profile_description, domicile, education, 
                                  employment_status, type_of_robot, distance, employment_status_criteria):
         session = Session()
-        
         hashed_password = bcrypt.generate_password_hash(password)
-        user = database.User(name=name, email=email, lastname=lastname, password=hashed_password)
+        user = database.User(name=name, email=email, image_file=image_file, lastname=lastname, password=hashed_password)
 
 
         profile = database.Profile(
@@ -39,22 +38,20 @@ def insert_user_and_user_profile(name, lastname, password, email, age, gender, p
         )
 
         criteria = UserCriteria(
-             type_of_robot=type_of_robot,
-             distance=distance,
-             employment_status=employment_status_criteria,
-             user=user
+                type_of_robot=type_of_robot,
+                distance=distance,
+                employment_status=employment_status_criteria,
+                user=user
         )
 
         session.add(user)
         session.add(profile)
         session.add(criteria)
         session.commit()
-        session.close()
 
-def insert_into_robots_db(name, type_of_robot, profile_description, domicile, procesor_unit, employment_status):
-        session_1 = Session()
-        
-        user_robot = UserRobot(name=name)
+def insert_into_robots_db(name, image_file, type_of_robot, profile_description, domicile, procesor_unit, employment_status):
+        session = Session()
+        user_robot = UserRobot(name=name, image_file=image_file)
 
         robot_profile = RobotProfile(
             type_of_robot=type_of_robot,
@@ -66,20 +63,17 @@ def insert_into_robots_db(name, type_of_robot, profile_description, domicile, pr
             user_robot=user_robot
         )
 
-        session_1.add(user_robot)
-        session_1.add(robot_profile)
-        session_1.commit() 
-        session_1.close()
+        session.add(user_robot)
+        session.add(robot_profile)
+        session.commit() 
 
 def select_all_from_database(model_class):
-     session_2 = Session()
-     all_information_from_db = session_2.query(model_class).all()
-     session_2.close()
-     return all_information_from_db
+    session = Session()
+    all_information_from_db = session.query(model_class).all()
+    return all_information_from_db
 
 def get_user_from_User_table(user):
-     session_3 = Session()
-     selected_user = session_3.query(User).filter_by(name=user).first()
-     session_3.close()
-     return selected_user
+    session = Session()
+    selected_user = session.query(User).filter_by(name=user).first()
+    return selected_user
 

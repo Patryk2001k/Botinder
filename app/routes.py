@@ -25,12 +25,6 @@ site_session = session
 @app.route("/")
 @app.route("/home")
 def home():
-    x = cipher_suite.encrypt(b"my password")
-    plain_text = cipher_suite.decrypt(x)
-    decoded = plain_text.decode("utf-8")
-    print(decoded)
-    print(type(decoded))
-
     if current_user.is_authenticated:
         return redirect(url_for("user_homepage"))
     else:
@@ -132,16 +126,15 @@ def get_main_image():
         type_of_robot = site_session.get("type_of_robot")
         distance = site_session.get("distance")
         employment_status_criteria = site_session.get("employment_status_criteria")
-
         
-        insert_user_and_user_profile(name, lastname, user_password_decoded, email, age, gender, profile_description, domicile, education, employment_status,
+        image_name = get_image(form.photo.data)
+        
+        insert_user_and_user_profile(name, lastname, user_password_decoded, email, image_name, age, gender, profile_description, domicile, education, employment_status,
                                      type_of_robot, distance, employment_status_criteria)    
         
         user = get_user_from_User_table(name)
 
         login_user(user)
-
-        get_image(form.photo.data)
 
         session.pop("name", None)
         session.pop("lastname", None)
@@ -173,8 +166,10 @@ def admin_site():
     if form.validate_on_submit():
         print(form.name.data)
         print(form.type_of_robot.data)
+        image_name = get_image(form.photo.data, form.name.data, "robots")
         insert_into_robots_db(
             form.name.data,
+            image_name,
             form.type_of_robot.data,
             form.profile_description.data,
             form.domicile.data,
@@ -185,7 +180,7 @@ def admin_site():
         print("-----------")
         print(select_all_from_database(RobotProfile))
 
-        get_image(form.photo.data, form.name.data, "robots")
+        
 
         return render_template("admin-site.html", form=form, message="Udało się dodać użytkownika")
     return render_template("admin-site.html", form=form)

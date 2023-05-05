@@ -88,12 +88,12 @@ class UserRobot(Base, UserMixin):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(20), nullable=False)
-    image_file = Column(String(20), nullable=False, default='default.jpg')
+    image_file = Column(String(40), nullable=False, default='default.jpg')
     messages = relationship('RobotMessages', backref='author', lazy=True)
     profile_robot = relationship("RobotProfile", uselist=False, back_populates="user_robot")
 
     def __repr__(self):
-        return f"User('{self.name}', '{self.image_file}')"
+        return f"UserRobot('{self.name}', '{self.image_file}')"
 
 class RobotMessages(Base, UserMixin):
     __tablename__ = "messages_robot"
@@ -104,7 +104,7 @@ class RobotMessages(Base, UserMixin):
     user_id = Column(Integer, ForeignKey('user_robot.id'), nullable=False)
 
     def __repr__(self):
-        return f"Messages('{self.message}')"
+        return f"RobotMessages('{self.message}')"
 
 class RobotProfile(Base, UserMixin):
     __tablename__ = "profile_robot"
@@ -121,7 +121,7 @@ class RobotProfile(Base, UserMixin):
     user_robot = relationship("UserRobot", back_populates="profile_robot")
 
     def __repr__(self):
-        return f"Profile('{self.user_robot}', '{self.type_of_robot}', '{self.name}', '{self.profile_description}', '{self.domicile}', '{self.procesor_unit}', '{self.employment_status}')"
+        return f"RobotProfile('{self.user_robot}', '{self.type_of_robot}', '{self.name}', '{self.profile_description}', '{self.domicile}', '{self.procesor_unit}', '{self.employment_status}')"
 
 
 engine = create_engine("sqlite:///Botinder.db", echo=True)
