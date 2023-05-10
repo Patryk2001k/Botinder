@@ -39,7 +39,7 @@ class UserProfileForm(FlaskForm):
 
     profile_description = TextAreaField("description", validators=[DataRequired()])
 
-    domicile = StringField("domicile", validators=[DataRequired()])
+    domicile = SelectField("domicile", validators=[DataRequired()], choices=[])
 
     education = StringField("education", validators=[DataRequired()])
 

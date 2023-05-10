@@ -123,6 +123,18 @@ class RobotProfile(Base, UserMixin):
     def __repr__(self):
         return f"RobotProfile('{self.user_robot}', '{self.type_of_robot}', '{self.name}', '{self.profile_description}', '{self.domicile}', '{self.procesor_unit}', '{self.employment_status}')"
 
+# Poniżej znajduje się baza danych dla admina
+
+class Admins(Base, UserMixin):
+    __tablename__ = "admins"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(20), nullable=False)
+    password = Column(String(60), nullable=False)
+
+    def __repr__(self):
+        return f"Admins({self.name}, {self.password})"
+
 
 engine = create_engine("sqlite:///Botinder.db", echo=True)
 Base.metadata.create_all(bind=engine)
@@ -131,72 +143,5 @@ Session = sessionmaker(bind=engine)
 session = Session()
 session.close()
 
-#Poniżej niepatrzeć bo to są komentarze przechowujące funkcje sqlalchemy itd.
 
-    #user = session.query(User).filter_by(username='butelka').first()
-    #profile = Profile(age=30, user=user)
-    #session.add(profile)
-    #session.commit()
-
-#    all_messages = session.query(Messages).all()
-#    all_users = session.query(User).all()
-#    users = session.query(User).with_entities(User.id, User.username).all()
-#    user_messages = session.query(Messages).join(User).filter(User.username == 'mdamowiec').all()
-#    all_profiles = session.query(Profile).all()
-#    profile = session.query(Profile).filter_by(age=30).first()
-
- #   username = "butelka1"  # zmienna z nazwą użytkownika, dla k#tórego chcemy wyświetlić dane z tabeli Profile
-
-    # Wyszukaj użytkownika o podanym nicku w tabeli User
-  #  user = session.query(User).filter_by(username=username).first()
-
-   # if user:
-        # Jeśli znaleziono użytkownika, wyświetl dane z tabeli Profile związane z tym użytkownikiem
-    #    profile = session.query(Profile).filter_by(user_id=user.id).first()
-     #   if profile:
-            #print(f"Wiek użytkownika {username}: {profile.age}")
-      #  else:
-       #     print(f"Brak danych profilowych dla użytkownika {username}")
-    #else:
-     #   print(f"Nie znaleziono użytkownika o nazwie {username}")
-
-    #print(profile)
-    #print("------")
-    #print(all_messages)
-    #print("------")
-    #print(all_users)
-    #print("------")
-    #print(users)
-    #rint("------")
-    #print(user_messages)
-    #print("-------")
-    #print(all_profiles)
-
-#user1 = User(username='Jan Kowalski', email='jan.kowalski@example.com', password='password123')
-#session.add(user1)
-#session.commit()
-
-# Dodanie wpisów
-#post1 = Post(title='Pierwszy wpis', content='To jest treść pierwszego wpisu', author=user1)
-#post2 = Post(title='Drugi wpis', content='To jest treść drugiego wpisu', author=user1)
-#session.add(post1)
-#session.add(post2)
-#session.commit()
-
-# Pobranie wpisów użytkownika
-#user_posts = session.query(User).all() #dodatkowa metoda to filter_by(username='Corey') albo coś takiego i w środku to przykład
-#for post in user_posts: #Wyświetlenie ich w konsolce
-#    print(post)
-#    print(post.username)
-#    #print(post.content)
-#    print('---')
-
-#    new_user = User(username='mdamowiec', email='madamowiec@example.com', password='password')
- ##   session.add(new_user)
-   # session.commit()
-
-    #message = "Siema co tam jak tam"
-    #new_message = Messages(username=new_user.username, email=new_user.email, message=message, author=new_user)
-    #session.add(new_message)
-    #session.commit()
     

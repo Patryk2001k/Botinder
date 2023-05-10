@@ -1,21 +1,36 @@
 from models import database
 from app import bcrypt
-from models.database import User, sessionmaker, engine, UserCriteria, UserRobot, RobotProfile
+from models.database import User, sessionmaker, engine, UserCriteria, UserRobot, RobotProfile, Admins
 Session = sessionmaker(bind=engine)
 
-def user_in_database(name, password):
+def user_in_database(password):
     session = Session()
     #user_exists = session.query(database.exists().where(database.User.name == name)).scalar()
-    user_password = session.query(database.User.password).filter_by(name=name).first()
-    check_password = ""
+    user = session.query(User).all()
     
-    if user_password is not None:
-        check_password = bcrypt.check_password_hash(user_password[0], password)
+    for x in user:
+         if bcrypt.check_password_hash(x.password, password):
+              return True
+    
+    
+    session.close()
+    return False
+
+def if_user_is_admin(name, password):
+    session = Session()
+    user_exists = session.query(database.exists().where(database.User.name == name)).scalar()
+    print(user_exists)
+    admin = session.query(Admins).all()
+    is_admin = False
+
+    for x in admin:
+         if bcrypt.check_password_hash(x.password, password):
+              is_admin = True
 
     session.close()
 
-    if check_password:
-        return True
+    if is_admin and user_exists:
+         return True
     else:
         return False
 

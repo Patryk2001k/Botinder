@@ -6,11 +6,13 @@ from models.database_operations import (
     select_all_from_database,
     insert_user_and_user_profile,
     insert_into_robots_db,
-    get_user_from_User_table
+    get_user_from_User_table,
+    if_user_is_admin
 )
 from models.database import User, UserRobot, RobotProfile
 from flask_login import UserMixin, login_user, logout_user, login_required, current_user
 from app.get_image import get_image
+from app.user_localization_and_distance import generate_random_ip, get_location
 
 class User(UserMixin):
     pass
@@ -18,7 +20,6 @@ class User(UserMixin):
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
-
 
 site_session = session
 
@@ -38,28 +39,32 @@ def lore():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        if not user_in_database(form.name.data, form.password.data):
+        if not user_in_database(form.password.data):
             user_password = form.password.data
             site_session['name'] = form.name.data
             site_session['lastname'] = form.lastname.data
             site_session['email'] = form.email.data
             site_session['password'] = cipher_suite.encrypt(user_password.encode())
             return redirect(url_for("user_profile"))
+        else:
+            message = "Przykro mi ale masz nieprawidłowe dane"
+            return render_template("register_form.html", form=form, register_failure_message=message)
     return render_template("register_form.html", form=form)
+ 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        if user_in_database(form.name.data, form.password.data):
+        if user_in_database(form.password.data) and if_user_is_admin(form.name.data, form.password.data):
             user = get_user_from_User_table(form.name.data)
             login_user(user)
             print(current_user.name)
             return redirect(url_for("user_homepage"))
         
-        elif form.name.data == "admin" and form.password.data == "admin@42141412admin":
+        elif if_user_is_admin(form.name.data, form.password.data):
             return redirect(url_for("admin_site"))
-
+        
         else:
             return render_template("login.html", form=form, login_failure_message="Użytkownik nie istnieje")
     
@@ -101,7 +106,7 @@ def user_criteria():
        site_session["type_of_robot"] = form.type_of_robot.data
        site_session["distance"] = form.distance.data
        site_session["employment_status_criteria"] = form.employment_status.data
-
+       
        return redirect(url_for("get_main_image"))
     return render_template("user-criteria-form.html", form=form)
 
@@ -127,7 +132,7 @@ def get_main_image():
         distance = site_session.get("distance")
         employment_status_criteria = site_session.get("employment_status_criteria")
         
-        image_name = get_image(form.photo.data)
+        image_name = get_image(form.photo.data, name)
         
         insert_user_and_user_profile(name, lastname, user_password_decoded, email, image_name, age, gender, profile_description, domicile, education, employment_status,
                                      type_of_robot, distance, employment_status_criteria)    
@@ -180,7 +185,6 @@ def admin_site():
         print("-----------")
         print(select_all_from_database(RobotProfile))
 
-        
 
         return render_template("admin-site.html", form=form, message="Udało się dodać użytkownika")
     return render_template("admin-site.html", form=form)

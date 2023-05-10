@@ -1,5 +1,4 @@
 import os
-from flask import send_from_directory
 from flask_uploads import UploadSet, IMAGES, configure_uploads
 from flask_login import current_user
 from werkzeug.utils import secure_filename
@@ -10,13 +9,9 @@ app.config["ALLOWED_IMAGE_EXTENSIONS"] = [".jpg", ".jpeg", ".png", ".gif"]
 photos = UploadSet("photos", IMAGES)
 configure_uploads(app, photos)
 
-def get_image(photo, name="", url_path="users"):
-    if name != "" and url_path != "users":
-        app.config["UPLOADED_PHOTOS_DEST"] = f"app/static/images/{url_path}/{name}"
-        os.makedirs(f"app/static/images/{url_path}/{name}", exist_ok=True)
-    else:
-        app.config["UPLOADED_PHOTOS_DEST"] = f"app/static/images/{url_path}/{current_user.name}"
-        os.makedirs(f"app/static/images/{url_path}/{current_user.name}", exist_ok=True)
+def get_image(photo, name, url_path="users"):
+    app.config["UPLOADED_PHOTOS_DEST"] = f"app/static/images/{url_path}/{name}"
+    os.makedirs(f"app/static/images/{url_path}/{name}", exist_ok=True)
     
     filename = secure_filename(photo.filename)
     file_ext = os.path.splitext(filename)[1]
