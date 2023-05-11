@@ -12,7 +12,7 @@ from models.database_operations import (
 from models.database import User, UserRobot, RobotProfile
 from flask_login import UserMixin, login_user, logout_user, login_required, current_user
 from app.get_image import get_image
-from app.user_localization_and_distance import generate_random_ip, get_location
+from app.user_localization_and_distance import generate_random_ip, get_location, get_cities, country_name_to_code
 
 class User(UserMixin):
     pass
@@ -26,6 +26,8 @@ site_session = session
 @app.route("/")
 @app.route("/home")
 def home():
+    print(get_location())
+    print(country_name_to_code("Poland"))
     if current_user.is_authenticated:
         return redirect(url_for("user_homepage"))
     else:

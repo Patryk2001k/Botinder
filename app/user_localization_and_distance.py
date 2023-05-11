@@ -3,6 +3,8 @@ import random
 from geonamescache import GeonamesCache
 from geopy.distance import geodesic
 from geopy.geocoders import Nominatim
+import country_converter as coco
+from geocoder import 
 
 def get_coordinates(city_name): #Generates latitude and longtude from city name
     geolocator = Nominatim(user_agent="Botinder") 
@@ -16,16 +18,18 @@ def get_coordinates(city_name): #Generates latitude and longtude from city name
         return None, None
 
 
-def get_state_capitals():
+def get_cities(country_code):
     gc = GeonamesCache()
     cities = gc.get_cities()
-    print(cities["1106542"])
-    for i in cities:
-        if cities[i]["countrycode"] == "PL":
+    #country_cities = [i for i in cities]
+    #print(country_cities["countrycode"])
+    #print(cities["1106542"])
+    #for i in cities:
+        #if cities[i]["countrycode"] == "PL":
             #print(cities[i]["name"])
-            if cities[i]["name"] == "Warszawa" or "Warszawa" in cities[i]["alternatenames"]:
-                print("---------------")
-                print(cities[i]["name"])
+            #if cities[i]["name"] == "Warszawa" or "Warszawa" in cities[i]["alternatenames"]:
+                #print("---------------")
+                #print(cities[i]["name"])
 
 
 def generate_random_ip() -> str: #Generates random IP address
@@ -45,3 +49,10 @@ def get_location(): #Functions gets localization from IP address
 
 def distance(first_cords, second_cords): #Oblicza odległośc pomiędzy jednymi koordynatami a drugimi
     return int(geodesic(first_cords, second_cords).km)
+
+def country_name_to_code(country_name):
+    try:
+        country_code = coco.convert(names=country_name, to='ISO3')
+        return country_code
+    except coco.CountryNotFoundError:
+        return None
