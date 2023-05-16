@@ -1,26 +1,23 @@
 from datetime import datetime
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    create_engine,
-    ForeignKey,
-    exists,
-    Enum
-)
+
+from flask_login import LoginManager, UserMixin
+from sqlalchemy import (Column, Enum, ForeignKey, Integer, String,
+                        create_engine, exists)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
-from flask_login import UserMixin, LoginManager
+from sqlalchemy.orm import relationship, sessionmaker
 
 Base = declarative_base()
 
 from app import app
+
 login_manager = LoginManager(app)
+
 
 @login_manager.user_loader
 def load_user(user_id):
     session = Session()
     return session.query(User).get(int(user_id))
+
 
 class User(Base, UserMixin):
     __tablename__ = "user"
@@ -29,26 +26,28 @@ class User(Base, UserMixin):
     name = Column(String(20), nullable=False)
     lastname = Column(String(40), nullable=False)
     email = Column(String(120), nullable=False)
-    image_file = Column(String(20), nullable=False, default='default.jpg')
+    image_file = Column(String(20), nullable=False, default="default.jpg")
     password = Column(String(60), nullable=False)
-    messages = relationship('Messages', backref='author', lazy=True)
+    messages = relationship("Messages", backref="author", lazy=True)
     profile = relationship("Profile", uselist=False, back_populates="user")
     user_criteria = relationship("UserCriteria", uselist=False, back_populates="user")
 
     def __repr__(self):
         return f"User('{self.name}', '{self.lastname}','{self.email}', '{self.password}', '{self.image_file}')"
 
+
 class Messages(Base, UserMixin):
     __tablename__ = "messages"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(20), nullable=False)
-    email = Column(String(120), unique=True, nullable=False )
+    email = Column(String(120), unique=True, nullable=False)
     message = Column(String(400), nullable=False)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
 
     def __repr__(self):
         return f"Messages('{self.name}', {self.email}, '{self.message}')"
+
 
 class Profile(Base, UserMixin):
     __tablename__ = "profile"
@@ -67,6 +66,7 @@ class Profile(Base, UserMixin):
     def __repr__(self):
         return f"Profile('{self.user}', '{self.age}', '{self.gender}', '{self.profile_description}', '{self.domicile}', '{self.education}', '{self.employment_status}')"
 
+
 class UserCriteria(Base, UserMixin):
     __tablename__ = "user_criteria"
 
@@ -81,19 +81,24 @@ class UserCriteria(Base, UserMixin):
     def __repr__(self):
         return f"Profile('{self.user}', '{self.type_of_robot}', '{self.distance}', '{self.employment_status}')"
 
-#Poniższe bazy danych dotyczą robotów (NPC) na stronie
+
+# Poniższe bazy danych dotyczą robotów (NPC) na stronie
+
 
 class UserRobot(Base, UserMixin):
     __tablename__ = "user_robot"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(20), nullable=False)
-    image_file = Column(String(40), nullable=False, default='default.jpg')
-    messages = relationship('RobotMessages', backref='author', lazy=True)
-    profile_robot = relationship("RobotProfile", uselist=False, back_populates="user_robot")
+    image_file = Column(String(40), nullable=False, default="default.jpg")
+    messages = relationship("RobotMessages", backref="author", lazy=True)
+    profile_robot = relationship(
+        "RobotProfile", uselist=False, back_populates="user_robot"
+    )
 
     def __repr__(self):
         return f"UserRobot('{self.name}', '{self.image_file}')"
+
 
 class RobotMessages(Base, UserMixin):
     __tablename__ = "messages_robot"
@@ -101,10 +106,11 @@ class RobotMessages(Base, UserMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(20), nullable=False)
     message = Column(String(400), nullable=False)
-    user_id = Column(Integer, ForeignKey('user_robot.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey("user_robot.id"), nullable=False)
 
     def __repr__(self):
         return f"RobotMessages('{self.message}')"
+
 
 class RobotProfile(Base, UserMixin):
     __tablename__ = "profile_robot"
@@ -123,7 +129,9 @@ class RobotProfile(Base, UserMixin):
     def __repr__(self):
         return f"RobotProfile('{self.user_robot}', '{self.type_of_robot}', '{self.name}', '{self.profile_description}', '{self.domicile}', '{self.procesor_unit}', '{self.employment_status}')"
 
+
 # Poniżej znajduje się baza danych dla admina
+
 
 class Admins(Base, UserMixin):
     __tablename__ = "admins"
@@ -142,6 +150,3 @@ Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 session.close()
-
-
-    
