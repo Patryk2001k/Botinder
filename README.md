@@ -11,11 +11,11 @@ This is my project to cv. Goal of this project is to create simple app where use
 - people and robots can send messages with each other
 
 # frameworks and technologies:
-- sqlalchemy (to store information in database)
-- flask (simple python web framework)
+- <a href="https://www.sqlalchemy.org/" alt="sqlalchemy">sqlalchemy</a> (to store information in database)
+- <a href="https://flask.palletsprojects.com/en/2.3.x/" alt="flask">flask</a> (simple python web framework)
 - flask_login (and everything with login_authentication)
 - flask_uploads
-- os library to create folders for current users and store images
+- <a href="https://docs.python.org/3/library/os.html" alt="os">os</a> library to create folders for current users and store images
 - Bcrypt to hash password
-- of course i use basic stuff like HTML, CSS, JS and jinja2, boostrap 
+- of course i use basic stuff like HTML, CSS, JS and jinja2, <a href="https://getbootstrap.com/" alt="Boostrap">Boostrap</a> 
 - <a href="https://alpinejs.dev/" alt="alpine.js">alpine.js</a> (i used this js framework to simple stuff with html, in shortcut this framework can do dynamic html in simple way and i think it is good for small projects)
