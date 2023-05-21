@@ -1,4 +1,4 @@
-# Botinder
+# Botinder https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white
 Botinder is simple app where you can join people with robots.
 
 This is my project to cv. Goal of this project is to create simple app where user can log in, send his profile picture and see robots. 
