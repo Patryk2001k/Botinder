@@ -17,25 +17,21 @@ from models.database_operations import (get_user_from_User_table,
 from models.forms import (AdminForm, LoginForm, RegistrationForm, UploadForm,
                           UserCriteria, UserProfileForm)
 
-
 class User(UserMixin):
     pass
-
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
 
-
 site_session = session
-
 
 @app.route("/")
 @app.route("/home")
 def home():
     # print(get_location())
     # print(country_name_to_code())
-    print(get_cities())
+    #print(get_cities())
     # x = country_name_to_code("Poland")
     # print(x)
     # print(get_cities(x))

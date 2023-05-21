@@ -10,3 +10,4 @@ login_manager = LoginManager(app)
 cipher_suite = Fernet(Fernet.generate_key())
 
 from app import routes, services
+from errors import handlers
