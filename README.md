@@ -18,4 +18,4 @@ This is my project to cv. Goal of this project is to create simple app where use
 - os library to create folders for current users and store images
 - Bcrypt to hash password
 - of course i use basic stuff like HTML, CSS, JS and jinja2, boostrap 
-- alpine.js (i used this js framework to simple stuff with html, in shortcut this framework can do dynamic html in simple way and i think it is good for small projects)
+- <a href="https://alpinejs.dev/" alt="alpine.js">alpine.js</a> (i used this js framework to simple stuff with html, in shortcut this framework can do dynamic html in simple way and i think it is good for small projects)
