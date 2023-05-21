@@ -10,7 +10,7 @@ This is my project to cv. Goal of this project is to create simple app where use
 - connect people with robots (like match on tinder)
 - people and robots can send messages with each other
 
-# frameworks and technologies like:
+# frameworks and technologies:
 - sqlalchemy (to store information in database)
 - flask (simple python web framework)
 - flask_login (and everything with login_authentication)
