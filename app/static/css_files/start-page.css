@@ -35,16 +35,17 @@ body{
     height: 300px;
 }
 
-.left-div, .right-div{
+.image-div, .text-div{
     margin-top: 75px;
 }
 
-.left-div{
+.image-div{
     margin-right: 5px;
 }
 
-.right-div{
+.text-div{
     margin-left: 15px;
+    margin-right: 15px;
     width: 500px;
 }
 

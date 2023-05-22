@@ -35,6 +35,7 @@ def home():
     # x = country_name_to_code("Poland")
     # print(x)
     # print(get_cities(x))
+    print("Warsaw")
     if current_user.is_authenticated:
         return redirect(url_for("user_homepage"))
     else:
