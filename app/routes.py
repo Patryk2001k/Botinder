@@ -4,7 +4,7 @@ from flask_login import (UserMixin, current_user, login_required, login_user,
 
 from app import app, cipher_suite, login_manager
 from app.get_image import get_image
-from app.user_localization_and_distance import (country_name_to_code,
+from app.geolocalization_services.user_localization_and_distance import (country_name_to_code,
                                                 generate_random_ip, get_cities,
                                                 get_location)
 from models.database import RobotProfile, User, UserRobot
@@ -51,10 +51,9 @@ def lore():
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        if not user_in_database(form.password.data):
+        if not user_in_database(form.password.data, form.username.data):
             user_password = form.password.data
-            site_session["name"] = form.name.data
-            site_session["lastname"] = form.lastname.data
+            site_session["username"] = form.username.data
             site_session["email"] = form.email.data
             site_session["password"] = cipher_suite.encrypt(user_password.encode())
             return redirect(url_for("user_profile"))
@@ -106,6 +105,8 @@ def user_profile():
     form = UserProfileForm()
     if form.validate_on_submit():
         site_session["age"] = form.age.data
+        site_session["name"] = form.name.data
+        site_session["lastname"] = form.lastname.data
         site_session["gender"] = form.gender.data
         site_session["profile_description"] = form.profile_description.data
         site_session["domicile"] = form.domicile.data
@@ -140,6 +141,7 @@ def user_criteria():
 def get_main_image():
     form = UploadForm()
     if form.validate_on_submit():
+        username = site_session.get("username")
         name = site_session.get("name")
         lastname = site_session.get("lastname")
         email = site_session.get("email")
@@ -161,6 +163,7 @@ def get_main_image():
         image_name = get_image(form.photo.data, name)
 
         insert_user_and_user_profile(
+            username,
             name,
             lastname,
             user_password_decoded,
@@ -181,6 +184,7 @@ def get_main_image():
 
         login_user(user)
 
+        session.pop("username", None)
         session.pop("name", None)
         session.pop("lastname", None)
         session.pop("email", None)

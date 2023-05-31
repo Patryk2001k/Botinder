@@ -21,6 +21,7 @@ def get_image(photo, name, url_path="users"):
     if file_ext not in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
         return "Nieprawidłowe rozszerzenie pliku"
     photo.save(os.path.join(app.config["UPLOADED_PHOTOS_DEST"], filename))
+    print(filename)
     return filename
     # file_url = url_for("get_file", filename=filename)
 

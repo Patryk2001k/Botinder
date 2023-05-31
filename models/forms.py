@@ -4,15 +4,11 @@ from wtforms import (BooleanField, IntegerField, PasswordField, SelectField,
                      StringField, SubmitField, TextAreaField)
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
-from app.user_localization_and_distance import get_cities
+from app.geolocalization_services.user_localization_and_distance import get_cities
 
 
 class RegistrationForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired(), Length(min=2, max=20)])
-
-    lastname = StringField(
-        "Lastname", validators=[DataRequired(), Length(min=2, max=40)]
-    )
+    username = StringField("Username", validators=[DataRequired(), Length(min=2, max=20)])
 
     email = StringField("Email", validators=[DataRequired(), Email()])
 
@@ -35,6 +31,10 @@ class LoginForm(FlaskForm):
 
 class UserProfileForm(FlaskForm):
     age = IntegerField("age", validators=[DataRequired()])
+
+    name = StringField("name", validators=[DataRequired()])
+
+    lastname = StringField("lastname", validators=[DataRequired()])
 
     gender = SelectField(
         "gender",

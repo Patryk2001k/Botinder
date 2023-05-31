@@ -6,14 +6,17 @@ from models.database import (Admins, RobotProfile, User, UserCriteria,
 Session = sessionmaker(bind=engine)
 
 
-def user_in_database(password):
+def user_in_database(password, username):
     session = Session()
-    # user_exists = session.query(database.exists().where(database.User.name == name)).scalar()
+    user_exists = session.query(database.exists().where(database.User.username == username)).scalar()
     user = session.query(User).all()
 
     for x in user:
         if bcrypt.check_password_hash(x.password, password):
             return True
+        
+    if user_exists:
+        return True
 
     session.close()
     return False
@@ -41,6 +44,7 @@ def if_user_is_admin(name, password):
 
 
 def insert_user_and_user_profile(
+    username,
     name,
     lastname,
     password,
@@ -59,6 +63,7 @@ def insert_user_and_user_profile(
     session = Session()
     hashed_password = bcrypt.generate_password_hash(password)
     user = database.User(
+        username=username,
         name=name,
         email=email,
         image_file=image_file,

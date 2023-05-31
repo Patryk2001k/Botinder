@@ -23,10 +23,11 @@ class User(Base, UserMixin):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(20), nullable=False)
     name = Column(String(20), nullable=False)
     lastname = Column(String(40), nullable=False)
     email = Column(String(120), nullable=False)
-    image_file = Column(String(20), nullable=False, default="default.jpg")
+    image_file = Column(String(240), nullable=False, default="default.jpg")
     password = Column(String(60), nullable=False)
     messages = relationship("Messages", backref="author", lazy=True)
     profile = relationship("Profile", uselist=False, back_populates="user")
