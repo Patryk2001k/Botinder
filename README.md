@@ -11,7 +11,7 @@ This is my project to cv. Goal of this project is to create simple app where use
 - people and robots can send messages with each other
 
 # frameworks and technologies:
-- <a href="https://www.sqlalchemy.org/" alt="sqlalchemy">sqlalchemy</a> (to store information in database)
+- <a href="https://www.sqlalchemy.org/" alt="sqlalchemy">sqlalchemy</a> (to store information in database i am using Postgresql)
 - <a href="https://flask.palletsprojects.com/en/2.3.x/" alt="flask">flask</a> (simple python web framework)
 - flask_login (and everything with login_authentication)
 - flask_uploads
