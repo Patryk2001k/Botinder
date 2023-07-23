@@ -2,24 +2,25 @@ from app import bcrypt
 from models import database
 from models.database import (Admins, RobotProfile, User, UserCriteria,
                              UserRobot, engine, sessionmaker)
-
+from sqlalchemy import exists
 Session = sessionmaker(bind=engine)
-
 
 def user_in_database(password, username):
     session = Session()
-    user_exists = session.query(database.exists().where(database.User.username == username)).scalar()
-    user = session.query(User).all()
 
-    for x in user:
-        if bcrypt.check_password_hash(x.password, password):
-            return True
-        
+    user_exists = session.query(exists().where(User.username == username)).scalar()
+
     if user_exists:
-        return True
+        user = session.query(User).filter_by(username=username).first()
+        if bcrypt.check_password_hash(user.password, password):
+            session.close()
+            return True
+        else:
+            return False
 
     session.close()
     return False
+
 
 
 def if_user_is_admin(name, password):
@@ -62,6 +63,7 @@ def insert_user_and_user_profile(
 ):
     session = Session()
     hashed_password = bcrypt.generate_password_hash(password)
+    print(hashed_password)
     user = database.User(
         username=username,
         name=name,

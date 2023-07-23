@@ -17,6 +17,8 @@ from models.database_operations import (get_user_from_User_table,
 from models.forms import (AdminForm, LoginForm, RegistrationForm, UploadForm,
                           UserCriteria, UserProfileForm)
 
+from app import bcrypt
+
 class User(UserMixin):
     pass
 
@@ -147,8 +149,12 @@ def get_main_image():
         email = site_session.get("email")
 
         password = site_session.get("password")
+        print(password)
         user_password_decrypted = cipher_suite.decrypt(password)
+        print(user_password_decrypted)
         user_password_decoded = user_password_decrypted.decode("utf-8")
+        print(user_password_decoded)
+        print(bcrypt.generate_password_hash(password))
 
         age = site_session.get("age")
         gender = site_session.get("gender")
@@ -202,11 +208,25 @@ def get_main_image():
         return redirect(url_for("user_homepage"))
     return render_template("get-main-image.html", form=form)
 
-
-@app.route("/user_homepage")
+"""
+@app.route("/user_homepage", methods=["GET", "POST"])
+def user_homepage():
+    logout_user()
+    return redirect(url_for("home"))
+"""
+@app.route("/user_homepage", methods=["GET", "POST"])
 @login_required
 def user_homepage():
     print(current_user.name)
+    
+    if request.method == 'POST':
+        data = request.get_json()
+        if data:
+            latitude = data.get('latitude')
+            longitude = data.get('longitude')
+            if latitude and longitude:
+                print(f"{latitude}, {longitude}")
+
     if current_user.is_authenticated:
         return render_template("user_homepage.html", user=current_user.name)
 

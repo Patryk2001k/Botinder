@@ -2,14 +2,15 @@ from datetime import datetime
 
 from flask_login import LoginManager, UserMixin
 from sqlalchemy import (Column, Enum, ForeignKey, Integer, String,
-                        create_engine, MetaData)
+                        create_engine, MetaData, Text)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy_utils import database_exists, create_database
+from geoalchemy2 import Geography
 
 Base = declarative_base()
 metadata = MetaData()
-DB_URL = "postgresql://postgres:password@localhost/Botinder"
+DB_URL = "postgresql://postgres:admin@localhost/botinder"
 
 from app import app
 
@@ -31,13 +32,15 @@ class User(Base, UserMixin):
     lastname = Column(String(40), nullable=False)
     email = Column(String(120), nullable=False)
     image_file = Column(String(240), nullable=False, default="default.jpg")
-    password = Column(String(60), nullable=False)
+    password = Column(Text, nullable=False)
+    #location = Column(Geography(geometry_type='POINT', srid=4326))
+    #domicile_geolocation = Column(Geography(geometry_type='POINT', srid=4326))
     messages = relationship("Messages", backref="author", lazy=True)
     profile = relationship("Profile", uselist=False, back_populates="user")
     user_criteria = relationship("UserCriteria", uselist=False, back_populates="user")
 
     def __repr__(self):
-        return f"User('{self.name}', '{self.lastname}','{self.email}', '{self.password}', '{self.image_file}')"
+        return f"User('{self.name}', '{self.lastname}','{self.email}', '{self.password}', '{self.image_file}', '{self.location}')"
 
 
 class Messages(Base, UserMixin):
@@ -95,6 +98,8 @@ class UserRobot(Base, UserMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(20), nullable=False)
     image_file = Column(String(40), nullable=False, default="default.jpg")
+    #location = Column(Geography(geometry_type='POINT', srid=4326))
+    #domicile_geolocation = Column(Geography(geometry_type='POINT', srid=4326))
     messages = relationship("RobotMessages", backref="author", lazy=True)
     profile_robot = relationship(
         "RobotProfile", uselist=False, back_populates="user_robot"
@@ -142,6 +147,7 @@ class Admins(Base, UserMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(20), nullable=False)
     password = Column(String(60), nullable=False)
+    #location = Column(Geography(geometry_type='POINT', srid=4326))
 
     def __repr__(self):
         return f"Admins({self.name}, {self.password})"
