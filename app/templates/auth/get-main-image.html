@@ -1,0 +1,28 @@
+{% extends 'main.html' %}
+{% block link %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css_files/get-main-image.css')}}">
+{% endblock %}
+{% block center %}
+<div class="container">
+    <div class="grey-div">
+        <div class="content-section">
+            <form method="POST" action="" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4" style="color: white;">Send your main user image</legend>
+                    <div class="form-group">
+                        {{ form.photo.label(class="form-control-label ") }}
+                        {{ form.photo(class="form-control form-control-lg register-input-class") }}
+                    </div>
+                </fieldset>
+                <div class="form-group">
+                    {{ form.submit_field(class="btn submit-button") }}
+                </div>
+                <div class="form-froup" style="color:red">
+                    {{ failure_message }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
