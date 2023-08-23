@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+    <link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet'>
+    <title>Admin-site</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css_files/admin-site.css')}}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/main_favicon.png') }}">
+</head>
+<body>
+<div class="container">
+    <div class="admin-top-menu">
+        <p onclick="adminLogout()" class="logout-paragraph">Wyloguj się</p>
+    </div>
+    <div class="form-container">
+        <div class="grey-div">
+            <div class="content-section">
+                <form method="POST" action="" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <fieldset class="form-group">
+                        <legend class="border-bottom mb-4">Tutaj do bazy danych możesz dodać NPC (roboty)</legend>
+                        <div class="form-group">
+                            {{ form.type_of_robot.label(class="form-control-label ") }}
+                            {{ form.type_of_robot(class="form-control form-control-lg register-input-class") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.name.label(class="form-control-label") }}
+                            {{ form.name(class="form-control form-control-lg register-input-class") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.procesor_unit.label(class="form-control-label") }}
+                            {{ form.procesor_unit(class="form-control form-control-lg register-input-class") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.profile_description.label(class="form-control-label") }}
+                            {{ form.profile_description(class="form-control form-control-lg register-input-class") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.employment_status.label(class="form-control-label") }}
+                            {{ form.employment_status(class="form-control form-control-lg register-input-class") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.domicile.label(class="form-control-label") }}
+                            {{ form.domicile(class="form-control form-control-lg register-input-class") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.photo.label(class="form-control-label") }}
+                            {{ form.photo(class="form-control form-control-lg register-input-class") }}
+                        </div>
+                    </fieldset>
+                    <div class="form-group">
+                        {{ form.submit_field(class="btn submit-button") }}
+                    </div>
+                    <div class="form-froup" style="color: lightblue">
+                        {{ message }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+<script>
+    function adminLogout(){
+        window.location.href = "{{ url_for('home') }}"
+    }
+</script>
+</body>
+</html>

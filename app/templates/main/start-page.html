@@ -1,0 +1,58 @@
+{% extends 'main.html' %}
+{% block link %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css_files/start-page.css')}}">
+{% endblock %}
+
+{% block center %}
+
+<div class="container">
+    <div class="main-header">
+        <h1>Zapraszamy do świata ludzi i robotów</h1>
+    </div>
+    <div class="main-div-1">
+        <div class="div-container">
+            <div class="image-div">
+                <div class="first-image"><img class="image-nr1" src="{{ url_for('static', filename='images/little-robot.jpg')}}"></div>
+            </div>
+            <div class="text-div">
+                <p>Botinder to aplikacja dla ludzi z pasją do robotyki i nowoczesnych technologii. 
+                    Nasza aplikacja pozwala Ci na połączenie z robotami, które spełnią Twoje marzenia i pragnienia. 
+                    Czy chcesz poznać robota, który będzie grał z Tobą w grę planszową, czy może robota, który pomoże 
+                    Ci w domowych obowiązkach? Od tego jest Botinder.</p>
+            </div>
+        </div>
+    </div>
+    <div class="main-div-2">
+        <div class="div-container">
+            <div class="text-div">
+                <p>Nasza aplikacja łączy ludzi i roboty w jednym miejscu. W naszej aplikacji, 
+                    poza roboczymi matchami, możesz znaleźć również ludzi, którzy podzielają Twoje zainteresowania i 
+                    pasje. Możesz poznać kogoś, z kim będziesz mógł rozwijać swoją pasję do robotyki lub po prostu 
+                    spędzać czas na miłych rozmowach.
+
+                </p>
+            </div>
+            <div class="image-div">
+                <div class="first-image"><img class="image-nr1" src="{{ url_for('static', filename='images/walking-in-love.jpg')}}"></div>
+            </div> 
+        </div>
+    </div>
+    <div class="main-div-3">
+        <h1>Czym jest <strong>Botinder?</strong></h1>
+        <div class="second-image">
+            <img class="article-image" src="{{ url_for('static', filename='images/cleaning-robot.jpg') }}">
+        </div>
+        <p class="main-article-paragraph">Aplikacja Botinder to aplikacja która pozwala na matchowanie ludzi i robotów.
+            Działa ona w taki sposób że wypełniamy rejestracyjny formularz po czym wchodzimy na stronę. Kiedy jesteśmy na 
+            stronie możemy zacząć wybierać i match-ować nasze roboty, miłej zabawy :)
+        </p>
+        <div class="register-div">
+            <button class="register-button">Rejestracja</button>
+        </div>
+    </div>
+    <div class="footer">
+        <p>Stworzone przez: P.W.</p>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='javascript_files/start-page.js') }}"></script>
+{% endblock %}

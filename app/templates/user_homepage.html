@@ -47,7 +47,7 @@
                     <div class="user-setting-option">Dokładne ustawienia konta</div>
                     <div class="user-setting-option">dane profilowe</div>
                     <div class="user-setting-option">do ilu km</div>
-                    <div class="user-setting-option" onclick="logout()">wylogowanie się</div>
+                    <div class="user-setting-option" data-logout-url="{{ url_for('logout') }}" onclick="logout(this)">wylogowanie się</div>
                 </div>
             </div>
         </div>
@@ -57,10 +57,6 @@
         </div>
     </div>
     <script src="https://unpkg.com/htmx.org@1.9.0"></script>
-    <script>
-        function logout(){
-            window.location.href = "{{ url_for('logout') }}";
-        }
-    </script>
+    <script src="{{ url_for('static', filename='javascript_files/user_homepage.js') }}"></script>
 </body>
 </html>
