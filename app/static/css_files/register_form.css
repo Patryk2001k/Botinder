@@ -14,12 +14,13 @@ body{
     align-items: center;
     height: 100vh;
     min-height: 100%;
+    margin-top: 50px
 }
 
 .grey-div{
     background-color: #414141;
     width: 600px;
-    height: 500px;
+    height: 1600px;
     margin: auto;
     border-radius: 5px;
     padding: 20px;

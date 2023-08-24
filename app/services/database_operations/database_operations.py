@@ -1,50 +1,55 @@
-from app import bcrypt
-from models import database
-from app.models import (Admins, RobotProfile, User, UserCriteria,
-                             UserRobot, engine, sessionmaker, Profile)
-from sqlalchemy import exists
 from geoalchemy2.elements import WKTElement
-from app.services.geolocalization_services.user_localization_and_distance import get_coordinates
+from geoalchemy2.functions import ST_DWithin
+from sqlalchemy import and_, exists, not_
+from sqlalchemy.orm import joinedload
+
+from app import bcrypt
+from app.models import (
+    Matches,
+    Profile,
+    RobotProfile,
+    User,
+    UserCriteria,
+    UserRobot,
+    engine,
+    sessionmaker,
+)
+from app.services.geolocalization_services.user_localization_and_distance import (
+    get_coordinates,
+)
+
 Session = sessionmaker(bind=engine)
+session = Session()
 
 
-def user_in_database(password, username):
-    session = Session()
+class UserObject:
+    def __init__(self, username):
+        self.username = username
+        self.user = session.query(User).filter_by(username=username).first()
+        session.close()
 
-    user_exists = session.query(exists().where(User.username == username)).scalar()
+    def user_exists(self):
+        print(self.user)
+        return self.user is not None
 
-    if user_exists:
-        user = session.query(User).filter_by(username=username).first()
-        print(user.password)
-        print(password)
-        if bcrypt.check_password_hash(user.password, password):
-            session.close()
-            return True
+    def password_exists(self, password):
+        users = session.query(User).all()
+        password_exists = False
+        for user in users:
+            if bcrypt.check_password_hash(user.password, password):
+                password_exists = True
+                break
+        session.close()
+        return password_exists
 
-    session.close()
-    return False
+    def check_user_in_db_registration(self, password):
+        return self.user_exists() or self.password_exists(password)
 
+    def check_user_in_db_login(self, password):
+        return self.user_exists() and self.password_exists(password)
 
-
-def if_user_is_admin(name, password):
-    session = Session()
-    user_exists = session.query(
-        database.exists().where(database.User.name == name)
-    ).scalar()
-    print(user_exists)
-    admin = session.query(Admins).all()
-    is_admin = False
-
-    for x in admin:
-        if bcrypt.check_password_hash(x.password, password):
-            is_admin = True
-
-    session.close()
-
-    if is_admin and user_exists:
-        return True
-    else:
-        return False
+    def is_admin(self):
+        return self.user_exists() and self.user.is_admin
 
 
 def insert_user_and_user_profile(
@@ -59,36 +64,36 @@ def insert_user_and_user_profile(
     profile_description,
     domicile,
     education,
-    employment_status,
+    employment_status_profile,
     type_of_robot,
     distance,
     employment_status_criteria,
 ):
-    session = Session()
-    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
 
     domicile_longitude_and_latitude = get_coordinates(domicile)
     longitude = domicile_longitude_and_latitude[0]
     latitude = domicile_longitude_and_latitude[1]
-    domicile_location = WKTElement(f'POINT({longitude} {latitude})', srid=4326)
+    domicile_location = WKTElement(f"POINT({longitude} {latitude})", srid=4326)
 
-    user = database.User(
+    user = User(
         username=username,
         name=name,
         email=email,
         image_file=image_file,
         lastname=lastname,
         password=hashed_password,
-        domicile_geolocation=domicile_location
+        domicile_geolocation=domicile_location,
+        # is_admin=True
     )
 
-    profile = database.Profile(
+    profile = Profile(
         age=age,
         gender=gender,
         profile_description=profile_description,
         domicile=domicile,
         education=education,
-        employment_status=employment_status,
+        employment_status=employment_status_profile,
         user=user,
     )
 
@@ -114,7 +119,6 @@ def insert_into_robots_db(
     procesor_unit,
     employment_status,
 ):
-    session = Session()
     user_robot = UserRobot(name=name, image_file=image_file)
 
     robot_profile = RobotProfile(
@@ -131,25 +135,62 @@ def insert_into_robots_db(
     session.add(robot_profile)
     session.commit()
 
+
 def update_user_location(longitude, latitude, user):
-    session = Session()
+    new_user_location = WKTElement(f"POINT({longitude} {latitude})", srid=4326)
 
-    new_user_location = WKTElement(f'POINT({longitude} {latitude})', srid=4326)
-
-    session.query(User).filter(User.username == user).update({User.location: new_user_location}, synchronize_session=False)
+    user.location = new_user_location
 
     session.commit()
 
 
 def select_all_from_database(model_class):
-    session = Session()
-    all_information_from_db = session.query(model_class).all()
-    return all_information_from_db
+    return session.query(model_class).all()
 
 
-def get_user_from_User_table(user):
-    session = Session()
-    selected_user = session.query(User).filter_by(username=user).first()
-    #domicile = session.query(Profile.domicile).join(User, User.id == Profile.user_id).filter(User.username == user).first()
-    #selected_user = [user_in_db, domicile]
-    return selected_user
+def get_user(user):
+    return session.query(User).filter_by(username=user).first()
+
+
+def get_not_matched_robots_by_localization(user):
+    distance = 50 * 1000  # 50 km przeliczone z metrów
+    MAX_ROBOTS = 50
+
+    robots_within_distance_not_matched = (
+        session.query(UserRobot)
+        .options(
+            joinedload(UserRobot.profile_robot)  # Dołączamy profile w jednym zapytaniu
+        )
+        .filter(
+            # Filtrowanie robotów, którzy nie są w tabeli Matches dla danego użytkownika
+            not_(
+                UserRobot.id.in_(
+                    session.query(Matches.robot_id).filter(Matches.user_id == user.id)
+                )
+            ),
+            # Filtrowanie robotów w określonej odległości od punktu odniesienia
+            ST_DWithin(UserRobot.location, user.location, distance),
+        )
+        .limit(MAX_ROBOTS)
+        .all()
+    )  # Ustawienie limitu robotów
+
+    return robots_within_distance_not_matched
+
+
+def add_match(user_id, robot_id):
+    new_match = Matches(user_id=user_id, robot_id=robot_id)
+    session.add(new_match)
+    session.commit()
+    return
+
+
+def get_user_criteria(user):
+    user_criteria = (
+        session.query(UserCriteria).filter(UserCriteria.user_id == user.id).first()
+    )
+    return user_criteria
+
+
+def download_matched_users(user, reference_point):
+    pass

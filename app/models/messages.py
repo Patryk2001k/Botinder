@@ -1,7 +1,7 @@
 from app.models import *
 
 
-class Messages(Base, UserMixin):
+class Messages(Base):
     __tablename__ = "messages"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -12,5 +12,3 @@ class Messages(Base, UserMixin):
 
     def __repr__(self):
         return f"Messages('{self.name}', {self.email}, '{self.message}')"
-
-
