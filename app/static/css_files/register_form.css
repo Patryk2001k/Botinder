@@ -1,0 +1,54 @@
+body{
+    background-color: #181818;
+    color: white;
+}
+
+::selection{
+    background-color: white;
+    color: #181818;
+}
+
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    min-height: 100%;
+    margin-top: 50px
+}
+
+.grey-div{
+    background-color: #414141;
+    width: 600px;
+    height: 1600px;
+    margin: auto;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.submit-button{
+    background-color: #414141;
+    border: 2px solid;
+    border-color: white;
+    border-radius: 5px;
+    color: white;
+    transition: background-color 0.3s ease;
+    transition: color 0.3 ease;
+}
+
+.submit-button:hover{
+    background-color: white;
+    border: 2px solid;
+    border-color: white;
+    border-radius: 5px;
+    color: #414141;
+}
+
+.register-input-class{
+    background-color: #414141;
+    border: 0px;
+    border-radius: 5px;
+    border-bottom: 2px solid;
+    border-color: white;
+    color: white;
+}
