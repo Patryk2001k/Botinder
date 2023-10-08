@@ -1,10 +1,4 @@
-import random
-import country_converter as coco
-import requests
-import json
-from ip2geotools.databases.noncommercial import DbIpCity
-from geopy.distance import geodesic
-from geopy.geocoders import Nominatim
+from services.geolocalization_services import *
 
 
 def get_coordinates(city_name):  # Generates latitude and longtude from city name
@@ -22,24 +16,9 @@ def get_coordinates(city_name):  # Generates latitude and longtude from city nam
 def get_cities():
     location = get_location()
     country_code = location["country"]
-    with open("app/geolocalization_services/cities.json", "r") as cities_data:
-        cities = json.load(cities_data)
-        cities_with_country_code = cities[country_code]
+    cities_with_country_code = cities[country_code]
 
-    country_cities = [
-        i["name"] for i in cities_with_country_code
-    ]
-
-    #print(country_cities)
-
-    # print(cities)
-    # for i in cities:
-    # if cities[i]["countrycode"] == country_code:
-    # print(cities[i]["name"])
-    # if cities[i]["name"] == "Warszawa" or "Warszawa" in cities[i]["alternatenames"]:
-    # print("---------------")
-    # print(cities[i]["name"])
-
+    country_cities = [i["name"] for i in cities_with_country_code]
     return country_cities
 
 
@@ -53,19 +32,22 @@ def generate_random_ip() -> str:  # Generates random IP address
     """
     return ip
 
+
 def get_location():  # Functions gets localization from IP address
     ip_address = generate_random_ip()
-    response = DbIpCity.get(generate_random_ip(), api_key='free')
+    response = DbIpCity.get(generate_random_ip(), api_key="free")
     location_data = {
         "ip": ip_address,
         "city": response.city,
         "region": response.region,
         "country": response.country,
     }
-    if location_data["country"] == None:
+    if location_data["country"] == None or location_data["country"] == "ZZ":
         print("IP jest None")
         return get_location()
-    return location_data
+    else:
+        print(location_data)
+        return location_data
 
 
 def distance(

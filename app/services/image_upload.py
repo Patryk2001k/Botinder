@@ -6,8 +6,6 @@ from werkzeug.utils import secure_filename
 
 from app import app
 
-app.config["UPLOADED_PHOTOS_DEST"] = f"app/static/images/users/current_user"
-app.config["ALLOWED_IMAGE_EXTENSIONS"] = [".jpg", ".jpeg", ".png", ".gif"]
 photos = UploadSet("photos", IMAGES)
 configure_uploads(app, photos)
 
