@@ -1,25 +1,17 @@
 from geoalchemy2.elements import WKTElement
 from geoalchemy2.functions import ST_DWithin
-from sqlalchemy import and_, exists, not_
-from sqlalchemy.orm import joinedload
+from sqlalchemy import and_, asc, exists, not_, or_
+from sqlalchemy.orm import aliased, joinedload
 
 from app import bcrypt
-from app.models import (
-    Matches,
-    Profile,
-    RobotProfile,
-    User,
-    UserCriteria,
-    UserRobot,
-    engine,
-    sessionmaker,
-)
+from app.models import engine, session
+from app.models.matches import RobotMatches, UserMatches
+from app.models.messages import ChatRoom, UserMessages
+from app.models.robots import RobotProfile, UserRobot
+from app.models.user import Profile, User, UserCriteria
 from app.services.geolocalization_services.user_localization_and_distance import (
     get_coordinates,
 )
-
-Session = sessionmaker(bind=engine)
-session = Session()
 
 
 class UserObject:
@@ -153,36 +145,29 @@ def get_user(user):
 
 
 def get_not_matched_robots_by_localization(user):
-    distance = 50 * 1000  # 50 km przeliczone z metrów
-    MAX_ROBOTS = 50
+    distance = user.user_criteria.distance * 1000  # distance * 1000 this value is in km
+    MAX_ROBOTS = 100
 
     robots_within_distance_not_matched = (
         session.query(UserRobot)
-        .options(
-            joinedload(UserRobot.profile_robot)  # Dołączamy profile w jednym zapytaniu
-        )
+        .options(joinedload(UserRobot.profile_robot))
         .filter(
-            # Filtrowanie robotów, którzy nie są w tabeli Matches dla danego użytkownika
+            # Filter robots that are not in UserMatches table
             not_(
                 UserRobot.id.in_(
-                    session.query(Matches.robot_id).filter(Matches.user_id == user.id)
+                    session.query(UserMatches.robot_id).filter(
+                        UserMatches.user_id == user.id
+                    )
                 )
             ),
-            # Filtrowanie robotów w określonej odległości od punktu odniesienia
+            # Filter by localization
             ST_DWithin(UserRobot.location, user.location, distance),
         )
         .limit(MAX_ROBOTS)
         .all()
-    )  # Ustawienie limitu robotów
+    )  # Set robots limit
 
     return robots_within_distance_not_matched
-
-
-def add_match(user_id, robot_id):
-    new_match = Matches(user_id=user_id, robot_id=robot_id)
-    session.add(new_match)
-    session.commit()
-    return
 
 
 def get_user_criteria(user):
@@ -192,5 +177,125 @@ def get_user_criteria(user):
     return user_criteria
 
 
-def download_matched_users(user, reference_point):
-    pass
+def add_match_unmatch(user_id, user_username, robot_id, robot_name, table_model):
+    new_match = table_model(
+        user_id=user_id,
+        user_username=user_username,
+        robot_id=robot_id,
+        robot_name=robot_name,
+    )
+    session.add(new_match)
+    session.commit()
+
+
+def get_matched_robots(user_id, user_username, include_chatroom_id="no"):
+    # Get matched users from UserMatches
+    user_matches_query = (
+        session.query(UserMatches)
+        .filter_by(user_id=user_id, user_username=user_username)
+        .all()
+    )
+
+    matched_robot_ids = [match.robot_id for match in user_matches_query]
+
+    # Download matched robots from RobotsMatches
+    robot_matches_query = (
+        session.query(RobotMatches)
+        .filter_by(user_id=user_id, user_username=user_username)
+        .all()
+    )
+
+    matched_robot_ids_from_robot_table = [
+        match.robot_id for match in robot_matches_query
+    ]
+
+    # Finding common matches
+    common_matched_robot_ids = list(
+        set(matched_robot_ids) & set(matched_robot_ids_from_robot_table)
+    )
+
+    # Download chatroom id if it is necessary
+    if include_chatroom_id == "yes":
+        chatroom_query = (
+            session.query(ChatRoom)
+            .filter(
+                ChatRoom.user_id == user_id,
+                ChatRoom.robot_id.in_(common_matched_robot_ids),
+            )
+            .all()
+        )
+
+        chatroom_ids = {chatroom.robot_id: chatroom.id for chatroom in chatroom_query}
+
+        # Join chatroom id-s to result
+        matched_with_chatroom = []
+        for match in user_matches_query:
+            chatroom_id = chatroom_ids.get(match.robot_id)
+            if chatroom_id and match.robot_id in common_matched_robot_ids:
+                matched_with_chatroom.append((match, chatroom_id))
+
+        return matched_with_chatroom
+
+    else:
+        RobotMatches_query = (
+            session.query(RobotMatches)
+            .filter(
+                RobotMatches.user_id == UserMatches.user_id,
+                RobotMatches.robot_id == UserMatches.robot_id,
+            )
+            .exists()
+        )
+
+        UserRobot_query = session.query(UserMatches).filter(
+            UserMatches.user_id == user_id,
+            UserMatches.user_username == user_username,
+            RobotMatches_query,
+        )
+
+        matched_users = UserRobot_query.all()
+        return matched_users
+
+
+def add_chatroom(user_id, robot_id):
+    chatroom = ChatRoom(user_id=user_id, robot_id=robot_id)
+    session.add(chatroom)
+    session.commit()
+
+
+def get_robot_info_by_chatroom_id(chatroom_id):
+    chatroom = session.query(ChatRoom).filter_by(id=chatroom_id).first()
+    if chatroom is not None:
+        robot = chatroom.robot
+        return robot
+    else:
+        return None
+
+
+def get_chatroom_messages(chatroom_id):
+    messages_query = (
+        session.query(UserMessages)
+        .filter_by(chatroom_id=chatroom_id)
+        .order_by(asc(UserMessages.timestamp))
+        .all()
+    )
+
+    messages = []
+
+    for message in messages_query:
+        message_details = {
+            "message": message.message,
+            "timestamp": message.timestamp,
+            "chatroom_id": message.chatroom_id,
+        }
+
+        messages.append([message_details, message.message_sender])
+
+    return messages
+
+
+def add_message_to_chatroom(message, chatroom_id, message_sender="user"):
+    new_message = UserMessages(
+        message=message, chatroom_id=chatroom_id, message_sender=message_sender
+    )
+    session.add(new_message)
+    session.commit()

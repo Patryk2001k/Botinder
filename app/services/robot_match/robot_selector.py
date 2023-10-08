@@ -1,7 +1,7 @@
 from geoalchemy2.shape import to_shape
 from geopy.distance import geodesic
 
-from services.database_operations.database_operations import (
+from app.services.database_operations.database_operations import (
     get_not_matched_robots_by_localization,
     get_user_criteria,
 )

@@ -24,11 +24,16 @@
                     {{ form.submit_field(class="btn submit-button") }}
                 </div>
                 <div class="form-froup" style="color:red">
-                    {{ login_failure_message }}
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}    
+                            {% for message in messages %}
+                                {{ message }}
+                            {% endfor %} 
+                        {% endif %}
+                    {% endwith %}
                 </div>
             </form>
         </div>
     </div>
 </div>
-
 {% endblock %}

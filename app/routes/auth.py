@@ -1,4 +1,13 @@
-from app.routes import *
+from flask import flash, redirect, render_template, url_for
+from flask_login import current_user, login_required, login_user, logout_user
+from app import app
+from app.forms.auth import LoginForm, RegistrationForm
+from app.services.database_operations.database_operations import (
+    UserObject,
+    get_user,
+    insert_user_and_user_profile,
+)
+from app.services.image_upload import get_image
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -31,12 +40,10 @@ def register():
 
             login_user(user)
 
-            return redirect(url_for("user_homepage"))
+            return redirect(url_for("check_user_location"))
         else:
-            message = "Przykro mi ale masz nieprawidłowe dane"
-            return render_template(
-                "auth/register.html", form=form, register_failure_message=message
-            )
+            flash("Przykro mi ale masz nieprawidłowe dane")
+            return render_template("auth/register.html", form=form)
     else:
         print(form.errors)
     return render_template("auth/register.html", form=form)
@@ -48,36 +55,39 @@ def login():
     if form.validate_on_submit():
         user = UserObject(form.username.data)
         user_log = get_user(form.username.data)
-        user_admin = user.is_admin()
-        if user.check_user_in_db_login(form.password.data) and not user_admin:
+        if user.check_user_in_db_login(form.password.data) and not user.is_admin():
             login_user(user_log)
+            return redirect(url_for("check_user_location"))
 
-            return redirect(url_for("user_homepage"))
-
-        elif user_admin:
+        elif user.is_admin():
             login_user(user_log)
             return redirect(url_for("admin_site"))
 
         else:
+            flash("Użytkownik nie istnieje")
             return render_template(
                 "auth/login.html",
                 form=form,
-                login_failure_message="Użytkownik nie istnieje",
             )
 
     elif not form.validate_on_submit() and form.submit_field.data:
-        failure_message = "Przykro mi ale nie udało ci się zalogować, sprawdź proszę dane które wprowadziłeś "
-        return render_template(
-            "auth/login.html", form=form, login_failure_message=failure_message
+        flash(
+            "Przykro mi ale nie udało ci się zalogować, sprawdź proszę dane które wprowadziłeś"
         )
+        return render_template("auth/login.html", form=form)
 
     else:
         return render_template("auth/login.html", form=form)
 
 
-@app.route("/logout", methods=["GET", "POST"])
+@app.route("/check_user_location", methods=["GET", "POST"])
+@login_required
+def check_user_location():
+    return render_template("auth/check_user_location/check_user_location.html")
+
+
+@app.route("/logout", methods=["GET"])
 @login_required
 def logout():
-    print(current_user.username)
     logout_user()
     return redirect(url_for("home"))
