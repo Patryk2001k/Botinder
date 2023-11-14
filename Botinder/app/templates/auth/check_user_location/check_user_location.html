@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet'>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css_files/check_user_location.css') }}">
+    <title>Check user location</title>
+</head>
+<body>
+    <div class="container">
+        <p class="centered-text">Witaj drogi użytkowniku teraz nasza przeglądarka spyta cię o lokalizację żeby zapewnić jak najlepsze warunki stworzone przez stronę. 
+            Ponad to strona główna się ładuje dlatego prosimy o cierpliwość.
+        </p>
+    </div>
+    <script>
+        function askForLocation() {
+    navigator.geolocation.watchPosition(function(position) {
+        var data = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+        }
+    
+        fetch('http://127.0.0.1:5000/get_geolocation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            }); 
+    })};
+    askForLocation();
+    </script>
+    
+</body>
+</html>
+
+
+
