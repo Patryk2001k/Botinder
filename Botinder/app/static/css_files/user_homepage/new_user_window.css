@@ -1,0 +1,152 @@
+
+.new-user-window{
+    background-color: rgb(52, 53, 54);
+    width: 350px;
+    height: 600px;
+    border-radius: 5px;
+    overflow-y: auto;
+    position: relative;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    -ms-overflow-style: none;
+
+}
+
+.new-user-window-image{
+    width: 100%;
+    height: 400px;
+}
+
+.new-user-window-inside-1{
+    padding: 10px;
+}
+
+.divider {
+    border: 0;
+    height: 1px;
+    background: #a86e6e; 
+    margin: 10px 0;  
+}
+
+.new-user-window-match-unmatch{
+    background-image: linear-gradient(to top, black, transparent);
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    height: 100px;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.new-user-window-unmatch-block {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%; 
+    background-color: #202020; 
+    position: relative;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.new-user-window-unmatch-cross {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.new-user-window-unmatch-line1,
+.new-user-window-unmatch-line2 {
+    background-color: red;
+    width: 30px;
+    height: 5px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.line1{
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.line2{
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.new-user-window-match-checkmark {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;  
+}
+
+.new-user-window-match-checkmark-circle {
+    width: 75px;
+    height: 75px;
+    background-color: #202020;
+    border-radius: 50%;
+    margin: 15px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.new-user-window-match-checkmark-stem,
+.new-user-window-match-checkmark-kick {
+    position: absolute;
+    background-color: green;
+    height: 8px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.new-user-window-match-checkmark-stem {
+    width: 20px;
+    bottom: 47.5px; 
+    left: 45px; 
+    transform: translate(-50%, 50%) rotate(45deg);
+}
+
+.new-user-window-match-checkmark-kick {
+    width: 30px;
+    bottom: 50px; 
+    left: 59px;  
+    transform: translate(-50%, 50%) rotate(-45deg);
+}
+
+.new-user-window-unmatch-block:hover{ 
+    background-color: red; 
+    cursor: pointer;
+}
+
+.new-user-window-unmatch-block:hover .new-user-window-unmatch-line1,
+.new-user-window-unmatch-block:hover .new-user-window-unmatch-line2{
+    background-color: #202020;
+}
+
+.new-user-window-match-checkmark-circle:hover {
+    background-color: green;
+    cursor: pointer;
+}
+
+.new-user-window-match-checkmark-circle:hover .new-user-window-match-checkmark-stem,
+.new-user-window-match-checkmark-circle:hover .new-user-window-match-checkmark-kick {
+    background-color: #202020;
+}
+
+.new-user-window {
+    transition: transform 0.3s ease-in-out;
+}
+
+.move-right {
+    transform: translate(500px, -200px) rotate(-90deg);  /* przesunięcie i obrót */
+}
+
+.move-left {
+    transform: translate(-500px, -200px) rotate(90deg);  /* przesunięcie i obrót w drugą stronę */
+}
