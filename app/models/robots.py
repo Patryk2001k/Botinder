@@ -1,33 +1,35 @@
-from app.models import *
+from geoalchemy2 import Geography
+from sqlalchemy import Column, Enum, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+
+from app.models import Base
 
 
-class UserRobot(Base):
-    __tablename__ = "user_robot"
+class UserRobotBase(Base):
+    __abstract__ = True
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(20), nullable=False)
     image_file = Column(String(40), nullable=False, default="default.jpg")
     location = Column(Geography(geometry_type="POINT", srid=4326))
     domicile_geolocation = Column(Geography(geometry_type="POINT", srid=4326))
-    messages = relationship("RobotMessages", backref="author", lazy=True)
-    profile_robot = relationship(
-        "RobotProfile", uselist=False, back_populates="user_robot"
-    )
 
     def __repr__(self):
         return f"UserRobot('{self.name}', '{self.image_file}')"
 
 
-class RobotMessages(Base):
-    __tablename__ = "messages_robot"
+class UserRobot(UserRobotBase):
+    __tablename__ = "user_robot"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(20), nullable=False)
-    message = Column(String(400), nullable=False)
-    user_id = Column(Integer, ForeignKey("user_robot.id"), nullable=False)
+    profile_robot = relationship(
+        "RobotProfile", uselist=False, back_populates="user_robot"
+    )
+    robot_matches_1 = relationship("UserMatches", back_populates="robot")
+    robot_matches = relationship("RobotMatches", back_populates="robot")
+    chatrooms = relationship("ChatRoom", back_populates="robot")
 
     def __repr__(self):
-        return f"RobotMessages('{self.message}')"
+        return f"UserRobot('{self.name}', '{self.image_file}')"
 
 
 class RobotProfile(Base):

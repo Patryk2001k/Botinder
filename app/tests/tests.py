@@ -1,4 +1,4 @@
-from app.tests import *
+import pytest
 
 
 def test_home_route_shows_start_page(client):

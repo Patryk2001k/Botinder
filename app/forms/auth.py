@@ -1,4 +1,24 @@
-from app.forms import *
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileAllowed, FileField, FileRequired
+from wtforms import (
+    IntegerField,
+    PasswordField,
+    SelectField,
+    StringField,
+    SubmitField,
+    TextAreaField,
+)
+from wtforms.validators import DataRequired, Email, EqualTo, Length
+
+from app.forms.enums import (
+    EmploymentStatusCriteria,
+    EmploymentStatusProfile,
+    Gender,
+    RobotType,
+)
+from app.services.geolocalization_services.user_localization_and_distance import (
+    get_cities,
+)
 
 
 class RegistrationForm(FlaskForm):
@@ -7,7 +27,6 @@ class RegistrationForm(FlaskForm):
     )
 
     email = StringField("Email", validators=[DataRequired(), Email()])
-
     password = PasswordField("Password", validators=[DataRequired()])
 
     confirm_password = PasswordField(
@@ -18,9 +37,8 @@ class RegistrationForm(FlaskForm):
         "type of robot",
         validators=[DataRequired()],
         choices=[
-            ("humanoid", "humanoid"),
-            ("non-humanoid", "non-humanoid"),
-            ("all", "all"),
+            (str(robot_type).replace("_", "-"), str(robot_type.value))
+            for robot_type in RobotType
         ],
     )
 
@@ -30,15 +48,13 @@ class RegistrationForm(FlaskForm):
     )
 
     age = IntegerField("age", validators=[DataRequired()])
-
     name = StringField("name", validators=[DataRequired()])
-
     lastname = StringField("lastname", validators=[DataRequired()])
 
     gender = SelectField(
         "gender",
         validators=[DataRequired()],
-        choices=[("male", "male"), ("female", "female"), ("custom", "custom")],
+        choices=[(str(Gender), str(Gender.value)) for Gender in Gender],
     )
 
     profile_description = TextAreaField("description", validators=[DataRequired()])
@@ -53,9 +69,8 @@ class RegistrationForm(FlaskForm):
         "employment status",
         validators=[DataRequired()],
         choices=[
-            ("working robot", "working robot"),
-            ("disabled", "disabled"),
-            ("all", "all"),
+            (str(employment).replace("_", " "), str(employment.value))
+            for employment in EmploymentStatusCriteria
         ],
     )
 
@@ -63,9 +78,8 @@ class RegistrationForm(FlaskForm):
         "employment_status",
         validators=[DataRequired()],
         choices=[
-            ("hired", "hired"),
-            ("unemployed", "unemployed"),
-            ("student", "student"),
+            (str(employment), str(employment.value))
+            for employment in EmploymentStatusProfile
         ],
     )
 
@@ -85,5 +99,4 @@ class LoginForm(FlaskForm):
     )
 
     password = PasswordField("Password", validators=[DataRequired()])
-
     submit_field = SubmitField("Login")
