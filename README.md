@@ -2,7 +2,7 @@
 Botinder is simple app where you can join people with robots.
 
 # Goal of this project :books::
-This is my project to cv. Goal of this project is to create simple app where user can log in, send his profile picture and see robots. 
+This is my project to cv. Goal of this project is to create simple app where user can log in, send his profile picture and match with robots. 
 
 
 # App must be:
@@ -19,3 +19,28 @@ This is my project to cv. Goal of this project is to create simple app where use
 - Bcrypt to hash password
 - of course i use basic stuff like HTML, CSS, JS and jinja2, <a href="https://getbootstrap.com/" alt="Boostrap">Boostrap</a> 
 - <a href="https://alpinejs.dev/" alt="alpine.js">alpine.js</a> (i used this js framework to simple stuff with html, in shortcut this framework can do dynamic html in simple way and i think it is good for small projects)
+
+## How to start on your local machine:
+To use this app, follow these steps:
+1. Clone the repository to your local machine.
+2. Install the required dependencies using `pip install -r requirements.txt`.
+3. Set up your PostgreSQL database and configure the connection in `__init__.py` in models module.
+4. Run the app using `python run.py`.
+5. Open your browser and go to `http://localhost:5000`.
+
+## Live Demo:
+A live demo of Botinder can be found at https://botinder.onrender.com/hom
+
+How to register:
+
+Just fill the blank parts but there are two important things.
+a) Domicile must be set for "Kraków" or if you are in Cracow you just need to accept that site will use your location. Answer why is that needed because if site will detect that you are in Berlin and there is no robots to match with then it will generate robots 
+and the problem in that is can take some time. Since i hosted in on free machine it is very slow.
+b) Username and login blanks must be diffrent from themselves
+
+Example account:
+If you dont want to register and want to just try the app this is test account:
+Login: Example
+Password: 444
+
+
