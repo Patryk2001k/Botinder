@@ -25,9 +25,10 @@ To use this app, follow these steps:
 1. Clone the repository to your local machine.
 2. Install the required dependencies using `pip install -r requirements.txt`.
 3. Set up your PostgreSQL database and configure the connection in `__init__.py` in models module.
-4. Before running the app start huey with this command `huey_consumer.py app.huey`
-5. Run the app using `python run.py`.
-6. Open your browser and go to `http://localhost:5000`.
+4. Start huey with this command `huey_consumer.py app.huey`
+5. Before running the app make sure that Botinder API is enabled, you can host it on your local machine and you can find it here [here](https://github.com/Patryk2001k/Botinder-API/tree/main)
+6. Run the app using `python run.py`.
+7. Open your browser and go to `http://localhost:5000`.
 
 ## Live Demo
 
