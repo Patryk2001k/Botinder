@@ -34,9 +34,11 @@ A live demo of Botinder can be found [here](https://botinder.onrender.com/home).
 
 ## How to Register
 
-To register, simply fill in the blank fields, but please note two important points:
-a) The domicile must be set to "Kraków" or, if you are in Cracow, you need to allow the site to use your location. This requirement exists because if the site detects that you are in Berlin and there are no robots to match with, it will generate robots. This process can be time-consuming, especially since the app is hosted on a free server, which is slower.
-b) The username and password must be different from each other.
+To register, simply fill in the blank fields. However, there are two important points to keep in mind:
+
+- **Domicile Setting**: Your domicile must be set to "Kraków". Alternatively, if you are in Cracow, you need to grant the site permission to use your location. This is necessary because if the site detects that you are in a location with no available robot matches, like Berlin, it will start generating robots. This can be a time-consuming process, especially since the app is hosted on a slower, free server.
+
+- **Account Information**: Ensure that your chosen username and password are different from each other to maintain account security.
 
 ## Example Account
 
