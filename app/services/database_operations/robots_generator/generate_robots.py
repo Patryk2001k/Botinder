@@ -5,7 +5,9 @@ from random import uniform
 from faker import Faker
 from geopy.distance import great_circle
 
+from app.models import Session
 from app.services.database_operations.database_operations import *
+from app.services.database_operations.database_operations import session_scope
 
 with open(
     "app/services/database_operations/robots_generator/descriptions.json",
@@ -23,13 +25,14 @@ def generate_random_location_within_radius(user_location, radius_km=50):
     return new_location.latitude, new_location.longitude
 
 
-def generate_random_robots(start=0, number_of_robots=20, user_location=None, user=None):
+# I need this function to generate robots and simulate search in database full of robots like 5000 robots
+def generate_random_robots(
+    start=0, number_of_robots=20, user_location=None, user=None, session=None
+):
     fake = Faker()
     print(user_location)
+
     for i in range(start, number_of_robots):
-        # Tworzenie losowej lokalizacji na świecie
-        # latitude = random.uniform(-90, 90)
-        # longitude = random.uniform(-180, 180)
         if user_location is not None and user.user_criteria.distance is not None:
             latitude, longitude = generate_random_location_within_radius(
                 user_location, user.user_criteria.distance
@@ -39,10 +42,8 @@ def generate_random_robots(start=0, number_of_robots=20, user_location=None, use
             latitude = random.uniform(-90, 90)
             longitude = random.uniform(-180, 180)
 
-        # Ustalanie lokalizacji dla robota
         robot_location = WKTElement(f"POINT({longitude} {latitude})", srid=4326)
 
-        # Generowanie losowej nazwy
         name = fake.first_name()
 
         type_of_robot = ["humanoid", "non-humanoid"]
@@ -54,7 +55,7 @@ def generate_random_robots(start=0, number_of_robots=20, user_location=None, use
 
         robot = UserRobot(
             name=name,
-            image_file=f"{choosed_type_of_robot}/{robots_images[choosed_type_of_robot][random.randint(0,len(robots_images[choosed_type_of_robot])-1)]}",
+            image_file=f"{choosed_type_of_robot}/{robots_images[choosed_type_of_robot][random.randint(0, len(robots_images[choosed_type_of_robot]) - 1)]}",
             location=robot_location,
             domicile_geolocation=robot_location,
         )
@@ -69,11 +70,11 @@ def generate_random_robots(start=0, number_of_robots=20, user_location=None, use
         robot_profile = RobotProfile(
             type_of_robot=choosed_type_of_robot,
             name=name,
-            profile_description=f"{r_descriptions[random.randint(0,len(r_descriptions) - 1)]}",
+            profile_description=f"{r_descriptions[random.randint(0, len(r_descriptions) - 1)]}",
             domicile=f"My-domicile{i}",
-            procesor_unit=f"{procesor_unit[random.randint(0,3)]}, {procesor_value[random.randint(0,9)]}000",
+            procesor_unit=f"{procesor_unit[random.randint(0, 3)]}, {procesor_value[random.randint(0, 9)]}000",
             employment_status=employment_status[random.randint(0, 1)],
             user_id=robot.id,
         )
+
         session.add(robot_profile)
-    session.commit()

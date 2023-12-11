@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -28,18 +27,18 @@
                 </div>
             </div>
             <div class="actually-matched-users" x-data="{ pairsa: true, messages: false }" x-show="matched">
-                <div class="actually-matched-users-menu">
+                <!--<div class="actually-matched-users-menu">
                     <div class="pairs" x-text="'Dopasowania'" @click="pairsa = true; messages = false"></div>
                     <div class="messages" x-text="'Wiadomości'" @click="pairsa = false; messages = true"></div>
-                </div>
-                <div class="main-match-users-menu" x-show="pairsa">
+                </div>-->
+                <div class="main-match-users-menu" data-static-url="{{ url_for('static', filename='images/robots/') }}" x-show="pairsa">
                     {% for i in matched_robots %}
-                    <div class="first-matched-user">
-                        <a href="{{ url_for('chatroom', chatroom_id=i[1]) }}">
-                            <img src="{{ url_for('static', filename='images/robots/' + i[0].robot.image_file)}}">
-                            <p>{{i[0].robot_name}}</p>
-                        </a>
-                    </div>
+                        <div class="first-matched-user">
+                            <a href="{{ url_for('chatroom', chatroom_id=i[1]) }}">
+                                <img src="{{ url_for('static', filename='images/robots/' + i[0].robot.image_file)}}">
+                                <p>{{i[0].robot_name}}</p>
+                            </a>
+                        </div>
                     {% endfor %}
                 </div>
                 <div class="user-messages" x-show="messages">
@@ -97,6 +96,24 @@
             </div>
         </div>
     </div>
+    <div id="custom-alert" class="custom-alert" style="display: none;">
+        <div class="custom-alert-content">
+          <span class="custom-alert-close" onclick="closeAlert()">&times;</span>
+          <p>It is a match!</p>
+        </div>
+    </div>
+    <div id="demo-end-alert" class="demo-end-alert" style="display: none;">
+        <div class="demo-end-alert-content">     
+            <p>Koniec dema technologicznego</p>
+            <a href="{{ url_for('check_user_location') }}">
+                <button class="grey-btn">Kontynuujmy (Wygeneruje roboty)</button>
+            </a>
+            <a href="{{ url_for('logout') }}">
+                <button class="grey-btn">Koniec (Wyloguje cię i zabierze do menu)</button>
+            </a>
+        </div>
+    </div>
+      
     <script src="https://unpkg.com/htmx.org@1.9.0"></script>
     <script src="{{ url_for('static', filename='javascript_files/user_homepage/logout_and_location_services.js') }}"></script>
     <script src="{{ url_for('static', filename='javascript_files/user_homepage/robot_match_unmatch_info.js') }}"></script>

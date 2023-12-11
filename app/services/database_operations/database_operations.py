@@ -1,23 +1,39 @@
+from contextlib import contextmanager
+
 from geoalchemy2.elements import WKTElement
 from geoalchemy2.functions import ST_DWithin
+from geoalchemy2.shape import to_shape
 from sqlalchemy import and_, asc, exists, not_, or_
-from sqlalchemy.orm import aliased, joinedload
+from sqlalchemy.orm import aliased, joinedload, sessionmaker
 
 from app import bcrypt
-from app.models import engine, session
-from app.models.matches import RobotMatches, UserMatches
-from app.models.messages import ChatRoom, UserMessages
+from app.models import Session, engine, session
+from app.models.chatroom import ChatRoom
+from app.models.matches import MatchBase, RobotMatches, UserMatches
+from app.models.messages import UserMessage
 from app.models.robots import RobotProfile, UserRobot
 from app.models.user import Profile, User, UserCriteria
-from app.services.geolocalization_services.user_localization_and_distance import (
-    get_coordinates,
-)
+from app.services.geolocalization_services.user_localization_and_distance import \
+    get_coordinates
+
+
+@contextmanager
+def session_scope():
+    session = Session()
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
 
 class UserObject:
-    def __init__(self, username):
-        self.username = username
-        self.user = session.query(User).filter_by(username=username).first()
+    def __init__(self, name):
+        self.name = name
+        self.user = session.query(User).filter_by(name=name).first()
         session.close()
 
     def user_exists(self):
@@ -60,14 +76,18 @@ def insert_user_and_user_profile(
     type_of_robot,
     distance,
     employment_status_criteria,
+    session,
 ):
     hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
-
+    """print(domicile)
+    print(get_coordinates(domicile))
     domicile_longitude_and_latitude = get_coordinates(domicile)
-    longitude = domicile_longitude_and_latitude[0]
-    latitude = domicile_longitude_and_latitude[1]
+    print(domicile_longitude_and_latitude)
+    print(domicile)
+    longitude = domicile_longitude_and_latitude[1]
+    latitude = domicile_longitude_and_latitude[0]
     domicile_location = WKTElement(f"POINT({longitude} {latitude})", srid=4326)
-
+    """
     user = User(
         username=username,
         name=name,
@@ -75,7 +95,7 @@ def insert_user_and_user_profile(
         image_file=image_file,
         lastname=lastname,
         password=hashed_password,
-        domicile_geolocation=domicile_location,
+        #domicile_geolocation=domicile_location,
         # is_admin=True
     )
 
@@ -103,6 +123,7 @@ def insert_user_and_user_profile(
 
 
 def insert_into_robots_db(
+    session,
     name,
     image_file,
     type_of_robot,
@@ -127,8 +148,12 @@ def insert_into_robots_db(
     session.add(robot_profile)
     session.commit()
 
+def update_user_location_domicile(session, user):
+    user.location = user.domicile_geolocation
+    user.domicile_geolocation = user.domicile_geolocation
+    session.commit()
 
-def update_user_location(longitude, latitude, user):
+def update_user_location(session, longitude, latitude, user):
     new_user_location = WKTElement(f"POINT({longitude} {latitude})", srid=4326)
 
     user.location = new_user_location
@@ -140,13 +165,19 @@ def select_all_from_database(model_class):
     return session.query(model_class).all()
 
 
-def get_user(user):
-    return session.query(User).filter_by(username=user).first()
+def get_user(session, name):
+    return session.query(User).filter_by(name=name).first()
 
 
-def get_not_matched_robots_by_localization(user):
+def get_not_matched_robots_by_localization(user, session):
     distance = user.user_criteria.distance * 1000  # distance * 1000 this value is in km
     MAX_ROBOTS = 100
+    if user.location:
+        print("Posiada lokalizację usera")
+        current_user_location = user.location
+    else:
+        print("Nie posiada")
+        current_user_location = to_shape(user.domicile_geolocation).wkt
 
     robots_within_distance_not_matched = (
         session.query(UserRobot)
@@ -161,7 +192,7 @@ def get_not_matched_robots_by_localization(user):
                 )
             ),
             # Filter by localization
-            ST_DWithin(UserRobot.location, user.location, distance),
+            ST_DWithin(UserRobot.location, current_user_location, distance),
         )
         .limit(MAX_ROBOTS)
         .all()
@@ -170,17 +201,17 @@ def get_not_matched_robots_by_localization(user):
     return robots_within_distance_not_matched
 
 
-def get_user_criteria(user):
+def get_user_criteria(user, session):
     user_criteria = (
         session.query(UserCriteria).filter(UserCriteria.user_id == user.id).first()
     )
     return user_criteria
 
 
-def add_match_unmatch(user_id, user_username, robot_id, robot_name, table_model):
+def add_match_unmatch(session, user_id, user_name, robot_id, robot_name, table_model):
     new_match = table_model(
         user_id=user_id,
-        user_username=user_username,
+        user_name=user_name,
         robot_id=robot_id,
         robot_name=robot_name,
     )
@@ -188,54 +219,52 @@ def add_match_unmatch(user_id, user_username, robot_id, robot_name, table_model)
     session.commit()
 
 
-def get_matched_robots(user_id, user_username, include_chatroom_id="no"):
-    # Get matched users from UserMatches
-    user_matches_query = (
-        session.query(UserMatches)
-        .filter_by(user_id=user_id, user_username=user_username)
-        .all()
+def get_user_matches(session, user_id, user_name):
+    return (
+        session.query(UserMatches).filter_by(user_id=user_id, user_name=user_name).all()
     )
 
-    matched_robot_ids = [match.robot_id for match in user_matches_query]
 
-    # Download matched robots from RobotsMatches
-    robot_matches_query = (
+def get_robot_matches(session, user_id, user_name):
+    return (
         session.query(RobotMatches)
-        .filter_by(user_id=user_id, user_username=user_username)
+        .filter_by(user_id=user_id, user_name=user_name)
         .all()
     )
 
-    matched_robot_ids_from_robot_table = [
-        match.robot_id for match in robot_matches_query
-    ]
 
-    # Finding common matches
-    common_matched_robot_ids = list(
-        set(matched_robot_ids) & set(matched_robot_ids_from_robot_table)
-    )
+def find_common_matches(user_matches, robot_matches):
+    user_match_ids = [match.robot_id for match in user_matches]
+    robot_match_ids = [match.robot_id for match in robot_matches]
+    return list(set(user_match_ids) & set(robot_match_ids))
 
-    # Download chatroom id if it is necessary
-    if include_chatroom_id == "yes":
-        chatroom_query = (
-            session.query(ChatRoom)
-            .filter(
-                ChatRoom.user_id == user_id,
-                ChatRoom.robot_id.in_(common_matched_robot_ids),
-            )
-            .all()
+
+def include_chatroomid(session, user_id, common_matched_robot_ids):
+    chatroom_query = (
+        session.query(ChatRoom)
+        .filter(
+            ChatRoom.user_id == user_id,
+            ChatRoom.robot_id.in_(common_matched_robot_ids),
         )
+        .all()
+    )
+    return {chatroom.robot_id: chatroom.id for chatroom in chatroom_query}
 
-        chatroom_ids = {chatroom.robot_id: chatroom.id for chatroom in chatroom_query}
 
-        # Join chatroom id-s to result
+def get_matched_robots(session, user_id, user_name, include_chatroom_id=False):
+    user_matches = get_user_matches(session, user_id, user_name)
+    robot_matches = get_robot_matches(session, user_id, user_name)
+
+    common_matched_robot_ids = find_common_matches(user_matches, robot_matches)
+
+    if include_chatroom_id:
+        chatroom_ids = include_chatroomid(session, user_id, common_matched_robot_ids)
         matched_with_chatroom = []
-        for match in user_matches_query:
+        for match in user_matches:
             chatroom_id = chatroom_ids.get(match.robot_id)
             if chatroom_id and match.robot_id in common_matched_robot_ids:
                 matched_with_chatroom.append((match, chatroom_id))
-
         return matched_with_chatroom
-
     else:
         RobotMatches_query = (
             session.query(RobotMatches)
@@ -248,21 +277,55 @@ def get_matched_robots(user_id, user_username, include_chatroom_id="no"):
 
         UserRobot_query = session.query(UserMatches).filter(
             UserMatches.user_id == user_id,
-            UserMatches.user_username == user_username,
+            UserMatches.user_name == user_name,
             RobotMatches_query,
         )
 
-        matched_users = UserRobot_query.all()
-        return matched_users
+        return UserRobot_query.all()
 
 
-def add_chatroom(user_id, robot_id):
+def get_single_matched_robot(user_id, user_name, robot_id, session):
+    # Find single matched user from UserMatches
+    user_match = (
+        session.query(UserMatches)
+        .filter_by(user_id=user_id, user_name=user_name, robot_id=robot_id)
+        .first()
+    )
+
+    # If no match found in UserMatches, return None
+    if not user_match:
+        return None
+
+    # Check if this robot is also matched in RobotMatches
+    robot_match = (
+        session.query(RobotMatches)
+        .filter_by(user_id=user_id, user_name=user_name, robot_id=robot_id)
+        .first()
+    )
+
+    # If the robot is not mutually matched, return None
+    if not robot_match:
+        return None
+
+    # Query for the chatroom ID
+    chatroom = (
+        session.query(ChatRoom).filter_by(user_id=user_id, robot_id=robot_id).first()
+    )
+
+    # Return the user match along with the chatroom ID, if it exists
+    if chatroom:
+        return user_match, chatroom.id
+    else:
+        return user_match, None
+
+
+def add_chatroom(session, user_id, robot_id):
     chatroom = ChatRoom(user_id=user_id, robot_id=robot_id)
     session.add(chatroom)
     session.commit()
 
 
-def get_robot_info_by_chatroom_id(chatroom_id):
+def get_robot_info_by_chatroom_id(session, chatroom_id):
     chatroom = session.query(ChatRoom).filter_by(id=chatroom_id).first()
     if chatroom is not None:
         robot = chatroom.robot
@@ -271,11 +334,11 @@ def get_robot_info_by_chatroom_id(chatroom_id):
         return None
 
 
-def get_chatroom_messages(chatroom_id):
+def get_chatroom_messages(session, chatroom_id):
     messages_query = (
-        session.query(UserMessages)
+        session.query(UserMessage)
         .filter_by(chatroom_id=chatroom_id)
-        .order_by(asc(UserMessages.timestamp))
+        .order_by(asc(UserMessage.timestamp))
         .all()
     )
 
@@ -293,9 +356,55 @@ def get_chatroom_messages(chatroom_id):
     return messages
 
 
-def add_message_to_chatroom(message, chatroom_id, message_sender="user"):
-    new_message = UserMessages(
+def add_message_to_chatroom(session, message, chatroom_id, message_sender="user"):
+    new_message = UserMessage(
         message=message, chatroom_id=chatroom_id, message_sender=message_sender
     )
     session.add(new_message)
     session.commit()
+
+
+def delete_chatroom(session, chatroom_id):
+    session.query(UserMessage).filter(UserMessage.chatroom_id == chatroom_id).delete()
+    chatroom_to_delete = (
+        session.query(ChatRoom).filter(ChatRoom.id == chatroom_id).one_or_none()
+    )
+    if chatroom_to_delete:
+        session.delete(chatroom_to_delete)
+        session.commit()
+        print(f"Chatroom with ID {chatroom_id} has been deleted.")
+    else:
+        print(f"Chatroom with ID {chatroom_id} not found.")
+
+
+def delete_matched_pair(session, user_name, robot_name):
+    user = session.query(User).filter(User.name == user_name).first()
+    robot = session.query(UserRobot).filter(UserRobot.name == robot_name).first()
+
+    if not user or not robot:
+        print(f"User or Robot not found with given names: {user_name}, {robot_name}.")
+        return
+
+    user_match = (
+        session.query(UserMatches)
+        .filter(UserMatches.user_id == user.id, UserMatches.robot_id == robot.id)
+        .first()
+    )
+
+    robot_match = (
+        session.query(RobotMatches)
+        .filter(RobotMatches.user_id == user.id, RobotMatches.robot_id == robot.id)
+        .first()
+    )
+
+    if user_match and robot_match:
+        session.delete(user_match)
+        session.delete(robot_match)
+        session.commit()
+        print(
+            f"Match between User '{user_name}' and Robot '{robot_name}' has been deleted from both UserMatches and RobotMatches."
+        )
+    else:
+        print(
+            f"Match not found in both UserMatches and RobotMatches for User '{user_name}' and Robot '{robot_name}'."
+        )

@@ -24,7 +24,7 @@ class UserRobot(UserRobotBase):
     profile_robot = relationship(
         "RobotProfile", uselist=False, back_populates="user_robot"
     )
-    robot_matches_1 = relationship("UserMatches", back_populates="robot")
+    user_matches = relationship("UserMatches", back_populates="robot")
     robot_matches = relationship("RobotMatches", back_populates="robot")
     chatrooms = relationship("ChatRoom", back_populates="robot")
 

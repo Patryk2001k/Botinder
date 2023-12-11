@@ -20,7 +20,7 @@ body{
 .grey-div{
     background-color: #414141;
     width: 600px;
-    height: 1600px;
+    height: 1630px;
     margin: auto;
     border-radius: 5px;
     padding: 20px;
@@ -51,4 +51,10 @@ body{
     border-bottom: 2px solid;
     border-color: white;
     color: white;
+}
+
+.description{
+    resize: none;
+    height: 200px;
+    overflow: hidden;
 }

@@ -159,7 +159,7 @@
   .user-image-chat{
     width: 100%;
     height: 500px;
-  }
+}
   
   .chat-user-description{
     width: 100%;
@@ -191,6 +191,14 @@
     border: 0.1px solid grey;
   }
   
+.right-main-div {
+    overflow-y: auto; 
+    scrollbar-width: none;
+}
+
+.right-main-div::-webkit-scrollbar {
+    display: none;
+}
   
   
   

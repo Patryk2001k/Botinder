@@ -17,8 +17,8 @@ class User(UserRobotBase, UserMixin):
     chatrooms = relationship("ChatRoom", back_populates="user", lazy=True)
     profile = relationship("Profile", uselist=False, back_populates="user")
     user_criteria = relationship("UserCriteria", uselist=False, back_populates="user")
-    user_matches_1 = relationship("UserMatches", back_populates="user")
-    user_matches = relationship("RobotMatches", back_populates="user")
+    user_matches = relationship("UserMatches", back_populates="user")
+    robot_matches = relationship("RobotMatches", back_populates="user_matches")
 
     def __repr__(self):
         return f"User('{self.username}', '{self.name}', '{self.lastname}','{self.email}', '{self.password}', '{self.image_file}', '{self.location}', '{self.domicile_geolocation}')"

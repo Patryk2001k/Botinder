@@ -1,24 +1,14 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField, FileRequired
-from wtforms import (
-    IntegerField,
-    PasswordField,
-    SelectField,
-    StringField,
-    SubmitField,
-    TextAreaField,
-)
+from wtforms import (IntegerField, PasswordField, SelectField, StringField,
+                     SubmitField, TextAreaField)
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
-from app.forms.enums import (
-    EmploymentStatusCriteria,
-    EmploymentStatusProfile,
-    Gender,
-    RobotType,
-)
-from app.services.geolocalization_services.user_localization_and_distance import (
-    get_cities,
-)
+from app.forms.utils import enum_to_choices
+from app.models.enums import (EmploymentStatusCriteria,
+                              EmploymentStatusProfile, Gender, RobotType)
+from app.services.geolocalization_services.user_localization_and_distance import \
+    get_cities
 
 
 class RegistrationForm(FlaskForm):
@@ -36,10 +26,7 @@ class RegistrationForm(FlaskForm):
     type_of_robot = SelectField(
         "type of robot",
         validators=[DataRequired()],
-        choices=[
-            (str(robot_type).replace("_", "-"), str(robot_type.value))
-            for robot_type in RobotType
-        ],
+        choices=enum_to_choices(RobotType, replace=True),
     )
 
     distance = IntegerField(
@@ -48,13 +35,13 @@ class RegistrationForm(FlaskForm):
     )
 
     age = IntegerField("age", validators=[DataRequired()])
-    name = StringField("name", validators=[DataRequired()])
+    name = StringField("login (must be diffrent from username field)", validators=[DataRequired()])
     lastname = StringField("lastname", validators=[DataRequired()])
 
     gender = SelectField(
         "gender",
         validators=[DataRequired()],
-        choices=[(str(Gender), str(Gender.value)) for Gender in Gender],
+        choices=enum_to_choices(Gender, replace=False),
     )
 
     profile_description = TextAreaField("description", validators=[DataRequired()])
@@ -68,19 +55,13 @@ class RegistrationForm(FlaskForm):
     employment_status_criteria = SelectField(
         "employment status",
         validators=[DataRequired()],
-        choices=[
-            (str(employment).replace("_", " "), str(employment.value))
-            for employment in EmploymentStatusCriteria
-        ],
+        choices=enum_to_choices(EmploymentStatusCriteria, replace=True),
     )
 
     employment_status_profile = SelectField(
         "employment_status",
         validators=[DataRequired()],
-        choices=[
-            (str(employment), str(employment.value))
-            for employment in EmploymentStatusProfile
-        ],
+        choices=enum_to_choices(EmploymentStatusProfile, replace=False),
     )
 
     photo = FileField(
@@ -94,9 +75,7 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    username = StringField(
-        "Username", validators=[DataRequired(), Length(min=2, max=20)]
-    )
+    name = StringField("Login", validators=[DataRequired(), Length(min=2, max=20)])
 
     password = PasswordField("Password", validators=[DataRequired()])
     submit_field = SubmitField("Login")

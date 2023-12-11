@@ -9,7 +9,7 @@ class MatchBase(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    user_username = Column(String(20), nullable=True)
+    user_name = Column(String(20), nullable=True)
     robot_id = Column(Integer, ForeignKey("user_robot.id"), nullable=False)
     robot_name = Column(String(20), nullable=True)
     match_type = Column(String(50))
@@ -18,7 +18,7 @@ class MatchBase(Base):
     __mapper_args__ = {"polymorphic_identity": "matches", "polymorphic_on": match_type}
 
     def __repr__(self):
-        return f"Match('{self.user_id}', '{self.robot_id}', '{self.user_username}', '{self.robot_name}')"
+        return f"Match('{self.user_id}', '{self.robot_id}', '{self.user_name}', '{self.robot_name}')"
 
 
 class UserMatches(MatchBase):
@@ -26,11 +26,11 @@ class UserMatches(MatchBase):
         "polymorphic_identity": "user_matches",
     }
 
-    user = relationship("User", back_populates="user_matches_1")
-    robot = relationship("UserRobot", back_populates="robot_matches_1")
+    user = relationship("User", back_populates="user_matches")
+    robot = relationship("UserRobot", back_populates="robot_matches")
 
     def __repr__(self):
-        return f"UserMatch('{self.user_id}', '{self.robot_id}', '{self.user_username}', '{self.robot_name}')"
+        return f"UserMatch('{self.user_id}', '{self.robot_id}', '{self.user_name}', '{self.robot_name}')"
 
 
 class RobotMatches(MatchBase):
@@ -38,11 +38,11 @@ class RobotMatches(MatchBase):
         "polymorphic_identity": "robot_matches",
     }
 
-    user = relationship("User", back_populates="user_matches")
+    user_matches = relationship("User", back_populates="user_matches")
     robot = relationship("UserRobot", back_populates="robot_matches")
 
     def __repr__(self):
-        return f"RobotMatch('{self.user_id}', '{self.robot_id}', '{self.user_username}', '{self.robot_name}')"
+        return f"RobotMatch('{self.user_id}', '{self.robot_id}', '{self.user_name}', '{self.robot_name}')"
 
 
 class UnMatches(MatchBase):
@@ -53,4 +53,4 @@ class UnMatches(MatchBase):
     # robot = relationship("UserRobot", backref="unmatches")
 
     def __repr__(self):
-        return f"UnMatch('{self.user_id}', '{self.robot_id}', '{self.user_username}', '{self.robot_name}')"
+        return f"UnMatch('{self.user_id}', '{self.robot_id}', '{self.user_name}', '{self.robot_name}')"

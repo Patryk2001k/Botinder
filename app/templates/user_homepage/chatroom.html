@@ -28,15 +28,13 @@
                 </div>
             </div>
             <div class="actually-matched-users" x-data="{ pairsa: true, messages: false }" x-show="matched">
-                <div class="actually-matched-users-menu">
-                    <div class="pairs" x-text="'Dopasowania'" @click="pairsa = true; messages = false"></div>
-                    <div class="messages" x-text="'Wiadomości'" @click="pairsa = false; messages = true"></div>
-                </div>
                 <div class="main-match-users-menu" x-show="pairsa">
                     {% for i in matched_robots %}
                     <div class="first-matched-user">
-                        <img src="{{ url_for('static', filename='images/robots/' + i[0].robot.image_file)}}">
-                        <p>{{i.robot_name}}</p>
+                        <a href="{{ url_for('chatroom', chatroom_id=i[1]) }}">
+                            <img src="{{ url_for('static', filename='images/robots/' + i[0].robot.image_file)}}">
+                            <p>{{i[0].robot_name}}</p>
+                        </a>
                     </div>
                     {% endfor %}
                 </div>
@@ -63,10 +61,10 @@
             </div>
         </div>
 
-        <div class="user-message">
+        <div class="user-message" x-data="{user: '{{user}}'}">
             <div class="left-main-div">
                 <div class="user-message-information">
-                    <div class="user-information">Taki i taki użytkownik spotkali się tego dnia i się zmatchowali</div>
+                    <div class="user-information" x-data="{{user}}">{{user}} i {{robot_info.profile_robot.name}} użytkownik zmatchowali się w celu przyszłych dobrych chwil</div>
                     <div class="user-information-image">
                         <a href="{{ url_for('user_homepage') }}">
                             <img src="{{url_for('static', filename='images/icons/x-mark.png')}}" class="user-information-image-x-mark">
@@ -90,9 +88,17 @@
             <div class="right-main-div">
                 <div class="user-image-chat"><img src="{{ url_for('static', filename='images/robots/'+robot_info.image_file) }}"></div>
                 <div class="chat-user-description">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum et deleniti fugiat commodi, architecto nulla a harum tempora, sapiente, ad vitae officia facilis eaque minima veniam? Sequi maiores dignissimos animi.
+                    <div id="user-display" class="new-user-window-inside-1" x-data="{{robot_info.id}}">
+                        <p style="font-size: 40px; margin: 0;" id="robot-name">{{robot_info.profile_robot.name}}</p><br>
+                        <!--<p id="distance-to-user"></p><br>-->
+                        <p id="processor-unit">Processor Unit: {{robot_info.profile_robot.procesor_unit}}</p><br>
+                        <p id="type-of-robot">Type of Robot: {{robot_info.profile_robot.type_of_robot}}</p><br>
+                        <p id="working-robot">Employment status: {{robot_info.profile_robot.employment_status}}</p><br>
+                        <hr class="divider">
+                        <p id="robot-description">{{robot_info.profile_robot.profile_description}}</p>
+                    </div>
                 </div>
-                <div class="delete-pair">
+                <div class="delete-pair" onclick="UnMatch()">
                     <h2 class="delete-pair-text">Usuń parę</h2>
                     <p class="delete-pair-text">Jeśli nie chcesz być z danym użytkownikiem kliknij tutaj</p>
                 </div>
@@ -100,7 +106,9 @@
         </div>
     </div>
     <script src="https://unpkg.com/htmx.org@1.9.0"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='javascript_files/user_homepage/logout_and_location_services.js') }}"></script>
     <script src="{{url_for('static', filename='javascript_files/user_homepage/chatroom.js')}}"></script>
+    <script src="{{url_for('static', filename='javascript_files/user_homepage/chat_socket_operations.js')}}"></script>
 </body>
 </html>

@@ -14,7 +14,8 @@
         </p>
     </div>
     <script>
-        function askForLocation() {
+
+        /*function askForLocation() {
     navigator.geolocation.watchPosition(function(position) {
         var data = {
             latitude: position.coords.latitude,
@@ -39,7 +40,57 @@
                 console.error('Error:', error);
             }); 
     })};
+    askForLocation();*/
+
+    function handleSuccess(position) {
+        var data = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
+        };
+
+        sendLocationData(data);
+    }
+
+    function handleError(error) {
+        if (error.code == error.PERMISSION_DENIED) {
+        console.error("Użytkownik odmówił dostępu do lokalizacji.");
+        var data = {
+            latitude: null,
+            longitude: null
+        };
+
+        sendLocationData(data);
+        }
+    }
+
+    function sendLocationData(data) {
+        fetch('/get_geolocation', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(data => {
+        if (data.redirect) {
+            window.location.href = data.redirect;
+        }
+        console.log('Success:', data);
+        })
+        .catch((error) => {
+        console.error('Error:', error);
+        });
+    }
+
+    function askForLocation() {
+        navigator.geolocation.watchPosition(handleSuccess, handleError);
+    }
+
     askForLocation();
+
+
+
     </script>
     
 </body>
