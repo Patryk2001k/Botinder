@@ -38,7 +38,7 @@ To register, simply fill in the blank fields. However, there are two important p
 
 - **Domicile Setting**: Your domicile must be set to "Kraków". Alternatively, if you are in Cracow, you need to grant the site permission to use your location. This is necessary because if the site detects that you are in a location with no available robot matches, like Berlin, it will start generating robots. This can be a time-consuming process, especially since the app is hosted on a slower, free server.
 
-- **Account Information**: Ensure that your chosen username and password are different from each other to maintain account security.
+- **Account Information**: Ensure that your chosen username and login fields are different from each other.
 
 ## Example Account
 
