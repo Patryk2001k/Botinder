@@ -29,7 +29,7 @@ To use this app, follow these steps:
 5. Open your browser and go to `http://localhost:5000`.
 
 ## Live Demo:
-A live demo of Botinder can be found at https://botinder.onrender.com/hom
+A live demo of Botinder can be found at https://botinder.onrender.com/home
 
 How to register:
 
