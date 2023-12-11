@@ -2,9 +2,7 @@ from geoalchemy2.shape import to_shape
 from geopy.distance import geodesic
 
 from app.services.database_operations.database_operations import (
-    get_not_matched_robots_by_localization,
-    get_user_criteria,
-)
+    get_not_matched_robots_by_localization, get_user_criteria, session_scope)
 
 MINIMUM_MATCHED_ROBOTS = MINIMUM_NOT_MATCHED_ROBOTS = 10
 
@@ -60,6 +58,8 @@ def sort_robots_by_distance(robots_array, user):
 
 def rank_robots(no_ranked_robots, user_criteria, user):
     robots_by_criteria = filter_robots_by_criteria(no_ranked_robots, user_criteria)
+    print("TUTAJ ROBOTS_BY CRITERIA")
+    print(robots_by_criteria)
     sorted_robots_matched = sort_robots_by_distance(
         robots_by_criteria["matched_robots"], user
     )
@@ -67,16 +67,22 @@ def rank_robots(no_ranked_robots, user_criteria, user):
         sorted_robots_not_matched = sort_robots_by_distance(
             robots_by_criteria["not_matched_robots"], user
         )
+        sorted_robots_matched.extend(sorted_robots_not_matched)
+    """
+    if len(sorted_robots_matched) < MINIMUM_MATCHED_ROBOTS:
+        sorted_robots_not_matched = sort_robots_by_distance(
+            robots_by_criteria["not_matched_robots"], user
+        )
         if len(sorted_robots_not_matched) < MINIMUM_NOT_MATCHED_ROBOTS:
             sorted_robots_matched.extend(sorted_robots_not_matched)
-
+    """
     return sorted_robots_matched
 
 
-def get_robots_for_user(user):
-    robots = get_not_matched_robots_by_localization(user)
-    user_criteria = get_user_criteria(user)
+def get_robots_for_user(user, session):
+    robots = get_not_matched_robots_by_localization(user, session)
+    user_criteria = get_user_criteria(user, session)
     if len(robots) > 1:
         return rank_robots(robots, user_criteria, user)
     else:
-        return "Przykro mi ale lista robotów jest za krótka"
+        return False

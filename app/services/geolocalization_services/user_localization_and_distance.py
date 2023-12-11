@@ -1,25 +1,23 @@
 import json
 import random
-
 import country_converter as coco
 from geopy.distance import geodesic
-from geopy.geocoders import Nominatim
 from ip2geotools.databases.noncommercial import DbIpCity
+from flask import request
+from app import BOTINDER_API_HEADERS, BOTINDER_API_URL, app
+from app.services.API_requests.requests import (get_botinderAPI_coordinates,
+                                                get_botinderAPI_distance)
 
-with open("app/services/geolocalization_services/cities.json", "r") as cities_data:
+with open("app/services/geolocalization_services/cities.JSON", "r") as cities_data:
     cities = json.load(cities_data)
 
 
 def get_coordinates(city_name):  # Generates latitude and longtude from city name
-    geolocator = Nominatim(user_agent="Botinder")
-    location = geolocator.geocode(city_name)
-
-    if location:
-        latitude = location.latitude
-        longitude = location.longitude
-        return latitude, longitude
-    else:
-        return None, None
+    response = get_botinderAPI_coordinates(
+        BOTINDER_API_HEADERS, city_name, BOTINDER_API_URL
+    )  # JSON format "city_name": , "latitude": , "longitude"
+    print(response)
+    return [response["latitude"], response["longitude"]]
 
 
 def get_cities():
@@ -31,38 +29,45 @@ def get_cities():
     return country_cities
 
 
-def generate_random_ip() -> str:  # Generates random IP address
-    ip = ".".join(
-        str(random.randint(0, 255)) for i in range(4)
-    )  # generating random ip addresses is for tests
+def get_ip() -> str:  # Generates random IP address
+    ip = app.config['STATIC_USER_IP']
     """
     if we want to get real user ip address we need to put this code:
     ip = request.remote_addr
+    ip = ".".join(
+        str(random.randint(0, 255)) for i in range(4)
+    )  # generating random ip addresses is for tests
     """
     return ip
 
 
 def get_location():  # Functions gets localization from IP address
-    ip_address = generate_random_ip()
-    response = DbIpCity.get(generate_random_ip(), api_key="free")
+    ip_address = get_ip()
+    response = DbIpCity.get(get_ip(), api_key="free")
     location_data = {
         "ip": ip_address,
         "city": response.city,
         "region": response.region,
         "country": response.country,
     }
-    if location_data["country"] == None or location_data["country"] == "ZZ":
+    """if location_data["country"] == None or location_data["country"] == "ZZ":
         print("IP jest None")
         return get_location()
     else:
         print(location_data)
-        return location_data
+        return location_data"""
+    return location_data
 
 
-def distance(
-    first_cords, second_cords
-):  # Calculate distance between coordinates in km.
-    return int(geodesic(first_cords, second_cords).km)
+def distance(first_lat, first_lon, second_lat, second_lon):
+    params = {
+        "first_lat": first_lat,
+        "first_lon": first_lon,
+        "second_lat": second_lat,
+        "second_lon": second_lon,
+    }
+    response = get_botinderAPI_distance(BOTINDER_API_HEADERS, params, BOTINDER_API_URL)
+    return response.get("distance")  # JSON format "distance": distance in km
 
 
 def country_name_to_code():
