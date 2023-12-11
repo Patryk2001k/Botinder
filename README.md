@@ -48,4 +48,7 @@ If you don't want to register and would like to try the app, here is a test acco
 - **Login:** Example
 - **Password:** 444
 
+## Site is slow and something cant load?
+I will be honest this site is hosted on free hosting and i dont have much resources so please be patinet and if something cant load like potentiall new matches and you waited a sec you can refresh the page it can help.
+
 
