@@ -25,8 +25,9 @@ To use this app, follow these steps:
 1. Clone the repository to your local machine.
 2. Install the required dependencies using `pip install -r requirements.txt`.
 3. Set up your PostgreSQL database and configure the connection in `__init__.py` in models module.
-4. Run the app using `python run.py`.
-5. Open your browser and go to `http://localhost:5000`.
+4. Before running the app start huey with this command `huey_consumer.py app.huey`
+5. Run the app using `python run.py`.
+6. Open your browser and go to `http://localhost:5000`.
 
 ## Live Demo
 
