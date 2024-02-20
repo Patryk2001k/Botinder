@@ -48,7 +48,7 @@ If you don't want to register and would like to try the app, here is a test acco
 - **Login:** Example
 - **Password:** 444
 
-## Site is slow and something cant load?
+## Site is slow and something can't load?
 Please be aware that my site is hosted on a **free hosting service** on [render](https://render.com/), and as such, **resources are limited**. I ask for your **patience** if the site responds more slowly than expected. If you encounter an issue where content, such as potential new matches, does not load promptly after a short wait, a page refresh may resolve the issue.
 
 
