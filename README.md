@@ -2,7 +2,7 @@
 Botinder is simple app where you can join people with robots.
 
 # Goal of this project :books::
-This is my project to cv. Goal of this project is to create simple app where user can log in, send his profile picture and match with robots. 
+Goal of this project is to create simple app where user can log in, send his profile picture and match with robots. 
 
 
 # App must be:
