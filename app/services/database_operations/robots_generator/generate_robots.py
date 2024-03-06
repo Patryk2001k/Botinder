@@ -30,14 +30,11 @@ def generate_random_robots(
     start=0, number_of_robots=20, user_location=None, user=None, session=None
 ):
     fake = Faker()
-    print(user_location)
-
     for i in range(start, number_of_robots):
         if user_location is not None and user.user_criteria.distance is not None:
             latitude, longitude = generate_random_location_within_radius(
                 user_location, user.user_criteria.distance
             )
-            print("Jest")
         else:
             latitude = random.uniform(-90, 90)
             longitude = random.uniform(-180, 180)
