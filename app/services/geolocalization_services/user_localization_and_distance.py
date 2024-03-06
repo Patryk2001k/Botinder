@@ -29,15 +29,8 @@ def get_cities():
     return country_cities
 
 
-def get_ip() -> str:  # Generates random IP address
+def get_ip() -> str:
     ip = app.config['STATIC_USER_IP']
-    """
-    if we want to get real user ip address we need to put this code:
-    ip = request.remote_addr
-    ip = ".".join(
-        str(random.randint(0, 255)) for i in range(4)
-    )  # generating random ip addresses is for tests
-    """
     return ip
 
 
@@ -50,12 +43,6 @@ def get_location():  # Functions gets localization from IP address
         "region": response.region,
         "country": response.country,
     }
-    """if location_data["country"] == None or location_data["country"] == "ZZ":
-        print("IP jest None")
-        return get_location()
-    else:
-        print(location_data)
-        return location_data"""
     return location_data
 
 
