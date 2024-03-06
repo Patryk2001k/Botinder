@@ -37,7 +37,6 @@ class UserObject:
         session.close()
 
     def user_exists(self):
-        print(self.user)
         return self.user is not None
 
     def password_exists(self, password):
@@ -79,15 +78,6 @@ def insert_user_and_user_profile(
     session,
 ):
     hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
-    """print(domicile)
-    print(get_coordinates(domicile))
-    domicile_longitude_and_latitude = get_coordinates(domicile)
-    print(domicile_longitude_and_latitude)
-    print(domicile)
-    longitude = domicile_longitude_and_latitude[1]
-    latitude = domicile_longitude_and_latitude[0]
-    domicile_location = WKTElement(f"POINT({longitude} {latitude})", srid=4326)
-    """
     user = User(
         username=username,
         name=name,
@@ -173,10 +163,8 @@ def get_not_matched_robots_by_localization(user, session):
     distance = user.user_criteria.distance * 1000  # distance * 1000 this value is in km
     MAX_ROBOTS = 100
     if user.location:
-        print("Posiada lokalizację usera")
         current_user_location = user.location
     else:
-        print("Nie posiada")
         current_user_location = to_shape(user.domicile_geolocation).wkt
 
     robots_within_distance_not_matched = (
@@ -382,7 +370,6 @@ def delete_matched_pair(session, user_name, robot_name):
     robot = session.query(UserRobot).filter(UserRobot.name == robot_name).first()
 
     if not user or not robot:
-        print(f"User or Robot not found with given names: {user_name}, {robot_name}.")
         return
 
     user_match = (
@@ -401,9 +388,6 @@ def delete_matched_pair(session, user_name, robot_name):
         session.delete(user_match)
         session.delete(robot_match)
         session.commit()
-        print(
-            f"Match between User '{user_name}' and Robot '{robot_name}' has been deleted from both UserMatches and RobotMatches."
-        )
     else:
         print(
             f"Match not found in both UserMatches and RobotMatches for User '{user_name}' and Robot '{robot_name}'."
