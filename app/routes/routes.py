@@ -27,11 +27,6 @@ from app.services.API_requests.requests import get_botinderAPI_coordinates, get_
 @app.route("/")
 @app.route("/home")
 def home():
-    #x = get_botinderAPI_coordinates_httpx(BOTINDER_API_HEADERS, "Warsaw", BOTINDER_API_URL)
-    #y = get_botinderAPI_coordinates_http(BOTINDER_API_HEADERS, "Warsaw", BOTINDER_API_URL)
-    #print(x)
-    #print(y)
-    #print(get_coordinates("Kraków"))
     app.config['STATIC_USER_IP'] = request.remote_addr
     if current_user.is_authenticated:
         return redirect(url_for("user_homepage"))
@@ -46,19 +41,6 @@ def lore():
 
 @app.route("/FAQ")
 def FAQ():
-    with current_app.app_context():
-        first_latitude = 50.0619474
-        first_longitude = 19.9368564
-        second_latitude = 52.2296756
-        second_longitude = 21.0122287
-        
-        # Wywołanie funkcji distance
-        calculated_distance = distance(first_latitude, first_longitude, second_latitude, second_longitude)
-
-        # Wyświetlenie wyniku
-        print(f"Odległość między punktami wynosi: {calculated_distance} km")
-
-        #print(get_coordinates("Kraków"))
         return render_template("main/FAQ.html")
 
 
@@ -67,21 +49,14 @@ def FAQ():
 def user_homepage():
     with session_scope() as session:
         robots_list = get_robots_for_user(current_user, session)
-        print(robots_list)
         if not robots_list:
-            print("?")
-            print(get_not_matched_robots_by_localization(current_user, session))
             generate_robots(
                 current_user=current_user, session=session, number_of_robots=5000
             )
             robots_list = get_robots_for_user(current_user, session)
-            print(robots_list)
         matched_robots = get_matched_robots(
             session, current_user.id, current_user.name, include_chatroom_id="yes"
         )
-        # print(matched_robots)
-        # print("-----------------------")
-        # print(matched_robots[0])
         return render_template(
             "user_homepage/user_homepage.html",
             user=current_user.username,
@@ -136,9 +111,6 @@ def match():
                 current_user.id, current_user.name, data["id"], session
             )
             robot_info = get_robot_info_by_chatroom_id(session, match_result[1])
-            print("TUTAJ")
-            print(match_result)
-            print(robot_info)
             match_result_json = {
                 "robot_image": robot_info.image_file,
                 "chatroom_id": match_result[1],
@@ -162,10 +134,6 @@ def chatroom(chatroom_id):
         )
         robot_info = get_robot_info_by_chatroom_id(session, chatroom_id)
         chat_messages = get_chatroom_messages(session, chatroom_id)
-        print(chat_messages)
-        print(robot_info)
-        print(robot_info.profile_robot.profile_description)
-        print(robot_info.profile_robot.name)
         return render_template(
             "user_homepage/chatroom.html",
             chatroom_id=chatroom_id,
@@ -203,7 +171,6 @@ def chatroom_unmatch():
 def send_message():
     try:
         client_data = request.json
-        print("received message: " + client_data["message"])
 
         GPT_response = calL_GPT_API()  # Załóżmy, że ta funkcja istnieje i działa.
 
@@ -233,13 +200,9 @@ def get_robots():
 @app.route("/get_geolocation", methods=["GET", "POST"])
 def get_geolocation():
     data = request.get_json()
-    print(current_user.username)
 
     latitude = data.get("latitude")
     longitude = data.get("longitude")
-    print(
-        f"{latitude}, {longitude}"
-    )  # If latitude is not None do wyszukiwania domicile
     with session_scope() as session:
         if latitude is not None and longitude is not None:
             update_user_location(session, longitude, latitude, current_user)
