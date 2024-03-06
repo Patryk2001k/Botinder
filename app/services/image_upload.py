@@ -22,6 +22,4 @@ def get_image(photo, name, url_path="users"):
         return "Nieprawidłowe rozszerzenie pliku"
 
     photo.save(os.path.join(app.config["UPLOADED_PHOTOS_DEST"], picture_fn))
-    print(picture_fn)
-    print(f_ext)
     return picture_fn
