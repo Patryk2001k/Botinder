@@ -13,13 +13,11 @@ from sqlalchemy_utils import create_database, database_exists
 
 Base = declarative_base()
 metadata = MetaData()
-DB_URL = "postgresql://botinder_3arm_user:k1Plvh9kElqSbBIr8mV8ONjb3doPhnAk@dpg-clo26seqc21c73e1mt30-a.frankfurt-postgres.render.com/botinder_3arm"
-#postgresql://postgres:admin@localhost/botinder
-#postgres://botinder_user:VfMYqNB31fnQLR6gjZvUltBtEd1ptNeC@dpg-clo1h8mqc21c73e1eae0-a.frankfurt-postgres.render.com/botinder
+DB_URL = "" #Put your DB URL here
 engine = create_engine(DB_URL, echo=True)
 if not database_exists(engine.url):
     create_database(engine.url)
-    print("Utworzono bazę danych.")
+    print("DB was created.")
 with engine.connect() as connection:
     connection.execute(text('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'))
     connection.execute(text('CREATE EXTENSION IF NOT EXISTS "postgis";'))
