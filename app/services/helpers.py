@@ -22,7 +22,6 @@ def robot_to_dict(table):
 
 def generate_robots(current_user, session, number_of_robots=5000):
     if current_user.location is None:
-        print("Not current user location")
         with session_scope() as session:
             update_user_location_domicile(session, current_user) #get_coordinates(current_user.profile.domicile)
         generate_random_robots(
@@ -33,7 +32,6 @@ def generate_robots(current_user, session, number_of_robots=5000):
             session=session,
         )
     else:
-        print("current_user_location")
         generate_random_robots(
             start=0,
             number_of_robots=number_of_robots,
