@@ -58,8 +58,6 @@ def sort_robots_by_distance(robots_array, user):
 
 def rank_robots(no_ranked_robots, user_criteria, user):
     robots_by_criteria = filter_robots_by_criteria(no_ranked_robots, user_criteria)
-    print("TUTAJ ROBOTS_BY CRITERIA")
-    print(robots_by_criteria)
     sorted_robots_matched = sort_robots_by_distance(
         robots_by_criteria["matched_robots"], user
     )
@@ -68,14 +66,6 @@ def rank_robots(no_ranked_robots, user_criteria, user):
             robots_by_criteria["not_matched_robots"], user
         )
         sorted_robots_matched.extend(sorted_robots_not_matched)
-    """
-    if len(sorted_robots_matched) < MINIMUM_MATCHED_ROBOTS:
-        sorted_robots_not_matched = sort_robots_by_distance(
-            robots_by_criteria["not_matched_robots"], user
-        )
-        if len(sorted_robots_not_matched) < MINIMUM_NOT_MATCHED_ROBOTS:
-            sorted_robots_matched.extend(sorted_robots_not_matched)
-    """
     return sorted_robots_matched
 
 
