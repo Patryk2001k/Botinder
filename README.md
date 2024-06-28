@@ -30,25 +30,3 @@ To use this app, follow these steps:
 6. Run the app using `python run.py`.
 7. Open your browser and go to `http://localhost:5000`.
 
-## Live Demo
-
-A live demo of Botinder can be found [here](https://botinder.onrender.com/home).
-
-## How to Register
-
-To register, simply fill in the blank fields. However, there are two important points to keep in mind:
-
-- **Domicile Setting**: Your domicile must be set to "Kraków". Alternatively, if you are in Cracow, you need to grant the site permission to use your location. This is necessary because if the site detects that you are in a location with no available robot matches, like Berlin, it will start generating robots. This can be a time-consuming process, especially since the app is hosted on a slower, free server.
-
-- **Account Information**: Ensure that your chosen username and login fields are different from each other.
-
-## Example Account
-
-If you don't want to register and would like to try the app, here is a test account:
-- **Login:** Example
-- **Password:** 444
-
-## Site is slow and something can't load?
-Please be aware that my site is hosted on a **free hosting service** on [render](https://render.com/), and as such, **resources are limited**. I ask for your **patience** if the site responds more slowly than expected. If you encounter an issue where content, such as potential new matches, does not load promptly after a short wait, a page refresh may resolve the issue.
-
-
