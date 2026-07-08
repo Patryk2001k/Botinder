@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
@@ -6,7 +8,6 @@ from flask_socketio import SocketIO
 from huey import RedisHuey
 
 from app.config import Config
-from app.services.API_requests.requests import get_botinderAPI_token
 
 # Inicjalizacja rozszerzeń (globalna, niepowiązana jeszcze z instancją aplikacji)
 bcrypt = Bcrypt()
@@ -29,14 +30,6 @@ def create_app(config_class=Config):
     # Konfiguracja managera logowania
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Zaloguj się, aby uzyskać dostęp do tej strony.'
-
-    # Pobieranie tokenu API (zapisujemy go bezpiecznie w konfiguracji aplikacji)
-    api_url = app.config["BOTINDER_API_URL"]
-    login_data = app.config["BOTINDER_API_LOGIN_DATA"]
-    
-    token = get_botinderAPI_token(api_url, login_data)
-    app.config["BOTINDER_API_TOKEN"] = token
-    app.config["BOTINDER_API_HEADERS"] = {"Authorization": f"Bearer {token}"}
 
     # Rejestracja Blueprintów (Modułów aplikacji)
     from app.routes.routes import main_bp

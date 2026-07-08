@@ -1,18 +1,16 @@
 from flask import Blueprint, flash, redirect, render_template, url_for
 from flask_login import login_required, login_user, logout_user
 from geoalchemy2.elements import WKTElement
-
+from app.services.database_operations.database_operations import (
+UserObject, get_user, insert_user_and_user_profile, session_scope)
+from app.services.geolocalization import GeolocalizationService
+from app.services.image_upload import get_image
 from app.forms.auth import LoginForm, RegistrationForm
 
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
-    from app.services.database_operations.database_operations import (
-        UserObject, get_coordinates, get_user, insert_user_and_user_profile,
-        session_scope)
-    from app.services.image_upload import get_image
-
     form = RegistrationForm()
     if form.validate_on_submit():
         if form.username.data != form.name.data:
@@ -43,7 +41,7 @@ def register():
 
                     login_user(user)
                     
-                    domicile_longitude_and_latitude = get_coordinates(form.domicile.data)
+                    domicile_longitude_and_latitude = GeolocalizationService.get_coordinates(form.domicile.data)
                     longitude = domicile_longitude_and_latitude[1]
                     latitude = domicile_longitude_and_latitude[0]
                     domicile_location = WKTElement(
