@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Quicksand' rel='stylesheet'>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css_files/error_layout.css') }}">
+    <title>{% block link %}{% endblock link %}</title>
+    {% block head %}{% endblock head %}
+</head>
+<body>
+    <div class="middle-div">
+        {% block content %}{% endblock content %}
+        <a href="{{ url_for('home')}}" class="Home-button">Home</a>
+    </div>
+</body>
+</html>

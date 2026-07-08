@@ -1,0 +1,44 @@
+body{
+    font-family: 'Quicksand';
+}
+
+.menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.menu-Botinder{
+    margin-right: 300px;
+    color: rgb(218, 75, 32);
+    width: 200px;
+    height: 75px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 25px;
+    font-size: 25px;
+}
+
+.menu-Botinder:hover{
+    color: rgb(218, 75, 32);
+    text-decoration: underline;
+}
+
+.menu-div{
+    width: 200px;
+    height: 75px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 25px;
+    color: white;
+    font-size: 25px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+a, a:hover{
+    color: white;
+}

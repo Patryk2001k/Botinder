@@ -1,0 +1,49 @@
+body{
+    background-color: #181818;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: white;
+    font-size: xx-large;
+    font-family: 'Quicksand';
+    overflow-y: hidden;
+}
+
+.middle-div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 1000px;
+}
+
+.Home-button{
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    border: 1px solid;
+    border-color: white;
+    background-color: #181818; 
+    width: 200px;
+    height: 75px;
+    font-size: 35px;
+    transition: background-color 0.3s ease;
+    transition: color 0.3 ease;
+    color: white;
+}
+
+.Home-button:hover{
+    background-color: white;
+    border: 1px solid;
+    border-color: white;
+    border-radius: 10px;
+    color: #181818;
+}
+
+::selection{
+    color: #181818;
+    background-color: white;
+}
