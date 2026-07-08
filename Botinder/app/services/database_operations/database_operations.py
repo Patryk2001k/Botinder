@@ -6,7 +6,6 @@ from geoalchemy2.shape import to_shape
 from sqlalchemy import and_, asc, exists, not_, or_
 from sqlalchemy.orm import aliased, joinedload, sessionmaker
 
-from app import bcrypt
 from app.models import Session, engine, session
 from app.models.chatroom import ChatRoom
 from app.models.matches import MatchBase, RobotMatches, UserMatches
@@ -38,6 +37,7 @@ class UserObject:
         return self.user is not None
 
     def password_exists(self, password):
+        from app import bcrypt
         users = session.query(User).all()
         password_exists = False
         for user in users:
@@ -75,6 +75,7 @@ def insert_user_and_user_profile(
     employment_status_criteria,
     session,
 ):
+    from app import bcrypt
     hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
     user = User(
         username=username,
