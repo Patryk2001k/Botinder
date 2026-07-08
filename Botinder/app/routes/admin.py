@@ -1,16 +1,17 @@
-from flask import render_template
+from flask import Blueprint, render_template
 from flask_login import login_required
 
-from app import app
 from app.forms.forms import AdminForm
-from app.services.database_operations.database_operations import (
-    insert_into_robots_db, session_scope)
-from app.services.image_upload import get_image
 
+admin_bp = Blueprint('admin', __name__)
 
-@app.route("/admin_site", methods=["GET", "POST"])
+@admin_bp.route("/admin_site", methods=["GET", "POST"])
 @login_required
 def admin_site():
+    from app.services.database_operations.database_operations import (
+        insert_into_robots_db, session_scope)
+    from app.services.image_upload import get_image
+
     form = AdminForm()
     if form.validate_on_submit():
         image_name = get_image(form.photo.data, form.name.data, "robots")

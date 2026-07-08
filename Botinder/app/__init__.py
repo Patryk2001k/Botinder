@@ -1,37 +1,59 @@
-from os import environ
-from pathlib import Path
-
+import os
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_socketio import SocketIO
 from huey import RedisHuey
-from app.services.API_requests.requests import get_botinderAPI_token, get_botinderAPI_coordinates
 
-app = Flask(__name__)
-app.config["SECRET_KEY"] = "12342132542@#242@4%891"
-destination_path = Path("app") / "static" / "images" / "users" / "current_user"
-app.config["UPLOADED_PHOTOS_DEST"] = str(destination_path)
-app.config["ALLOWED_IMAGE_EXTENSIONS"] = [".jpg", ".jpeg", ".png", ".gif"]
-app.config['STATIC_USER_IP'] = ""
-bcrypt = Bcrypt(app)
-login_manager = LoginManager(app)
+from app.config import Config
+from app.services.API_requests.requests import get_botinderAPI_token
 
-redis_url = environ.get("REDIS_URL", "redis://redis:6379/0")
+# Inicjalizacja rozszerzeń (globalna, niepowiązana jeszcze z instancją aplikacji)
+bcrypt = Bcrypt()
+login_manager = LoginManager()
+socketio = SocketIO()
+
+# Huey inicjalizujemy globalnie, odczytując adres Redisa z konfiguracji środowiskowej
+redis_url = os.environ.get("REDIS_URL", "redis://redis:6379/0")
 huey = RedisHuey('botinder-tasks', url=redis_url)
 
-# POPRAWKA: Dynamiczne pobieranie adresu URL mikrousługi z Dockera
-BOTINDER_API_URL = environ.get("BOTINDER_API_URL", "http://127.0.0.1:8000")
-BOTINDER_API_LOGIN_DATA = {"username": "botinder", "password": "botinderpassword"}
-BOTINDER_API_TOKEN = get_botinderAPI_token(BOTINDER_API_URL, BOTINDER_API_LOGIN_DATA)
-BOTINDER_API_HEADERS = {"Authorization": f"Bearer {BOTINDER_API_TOKEN}"}
+def create_app(config_class=Config):
+    app = Flask(__name__)
+    app.config.from_object(config_class)
 
-from app import forms, routes, services, tests
-from app.errors import handlers
-from app.models import *
-from app.routes import admin, auth, routes
+    # Powiązanie rozszerzeń z nowo utworzoną instancją aplikacji
+    bcrypt.init_app(app)
+    login_manager.init_app(app)
+    socketio.init_app(app)
 
+    # Konfiguracja managera logowania
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message = 'Zaloguj się, aby uzyskać dostęp do tej strony.'
 
+    # Pobieranie tokenu API (zapisujemy go bezpiecznie w konfiguracji aplikacji)
+    api_url = app.config["BOTINDER_API_URL"]
+    login_data = app.config["BOTINDER_API_LOGIN_DATA"]
+    
+    token = get_botinderAPI_token(api_url, login_data)
+    app.config["BOTINDER_API_TOKEN"] = token
+    app.config["BOTINDER_API_HEADERS"] = {"Authorization": f"Bearer {token}"}
+
+    # Rejestracja Blueprintów (Modułów aplikacji)
+    from app.routes.routes import main_bp
+    from app.routes.auth import auth_bp
+    from app.routes.admin import admin_bp
+    from app.errors.handlers import errors_bp
+
+    app.register_blueprint(main_bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(errors_bp)
+
+    return app
+
+# Ładowacz użytkownika dla Flask-Login (dynamiczny import modeli zapobiega cyklicznym importom)
 @login_manager.user_loader
 def load_user(user_id):
+    from app.models import session
+    from app.models.user import User
     return session.query(User).get(int(user_id))

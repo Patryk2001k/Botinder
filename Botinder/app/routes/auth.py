@@ -1,16 +1,18 @@
-from flask import flash, redirect, render_template, url_for
-from flask_login import current_user, login_required, login_user, logout_user
+from flask import Blueprint, flash, redirect, render_template, url_for
+from flask_login import login_required, login_user, logout_user
 from geoalchemy2.elements import WKTElement
 
-from app import app
 from app.forms.auth import LoginForm, RegistrationForm
-from app.services.database_operations.database_operations import (
-    UserObject, get_coordinates, get_user, insert_user_and_user_profile,
-    session_scope)
-from app.services.image_upload import get_image
 
-@app.route("/register", methods=["GET", "POST"])
+auth_bp = Blueprint('auth', __name__)
+
+@auth_bp.route("/register", methods=["GET", "POST"])
 def register():
+    from app.services.database_operations.database_operations import (
+        UserObject, get_coordinates, get_user, insert_user_and_user_profile,
+        session_scope)
+    from app.services.image_upload import get_image
+
     form = RegistrationForm()
     if form.validate_on_submit():
         if form.username.data != form.name.data:
@@ -40,8 +42,6 @@ def register():
                     user = get_user(session, form.name.data)
 
                     login_user(user)
-                    print(form.domicile.data)
-                    print(type(form.domicile.data))
                     
                     domicile_longitude_and_latitude = get_coordinates(form.domicile.data)
                     longitude = domicile_longitude_and_latitude[1]
@@ -51,7 +51,7 @@ def register():
                     )
                     user.domicile_geolocation = domicile_location
                     session.commit()
-                    return redirect(url_for("check_user_location"))
+                    return redirect(url_for("auth.check_user_location"))
             else:
                 flash("Przykro mi ale taki użytkownik już istnieje w bazie danych")
                 return render_template("auth/register.html", form=form)
@@ -65,8 +65,11 @@ def register():
     return render_template("auth/register.html", form=form)
 
 
-@app.route("/login", methods=["GET", "POST"])
+@auth_bp.route("/login", methods=["GET", "POST"])
 def login():
+    from app.services.database_operations.database_operations import (
+        UserObject, get_user, session_scope)
+
     form = LoginForm()
     if form.validate_on_submit():
         user = UserObject(form.name.data)
@@ -74,11 +77,11 @@ def login():
             user_log = get_user(session, form.name.data)
             if user.check_user_in_db_login(form.password.data) and not user.is_admin():
                 login_user(user_log)
-                return redirect(url_for("check_user_location"))
+                return redirect(url_for("auth.check_user_location"))
 
             elif user.is_admin():
                 login_user(user_log)
-                return redirect(url_for("admin_site"))
+                return redirect(url_for("admin.admin_site"))
 
             else:
                 flash("Użytkownik nie istnieje")
@@ -97,14 +100,14 @@ def login():
         return render_template("auth/login.html", form=form)
 
 
-@app.route("/check_user_location", methods=["GET", "POST"])
+@auth_bp.route("/check_user_location", methods=["GET", "POST"])
 @login_required
 def check_user_location():
     return render_template("auth/check_user_location/check_user_location.html")
 
 
-@app.route("/logout", methods=["GET"])
+@auth_bp.route("/logout", methods=["GET"])
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for("home"))
+    return redirect(url_for("main.home"))
