@@ -1,7 +1,5 @@
 from app.services.database_operations.robots_generator.generate_robots import \
     generate_random_robots, update_user_location_domicile, session_scope
-from app.services.geolocalization_services.user_localization_and_distance import \
-    get_coordinates
 from app.services.robot_match.robot_selector import to_shape, wkt_to_tuple
 
 def robot_to_dict(table):

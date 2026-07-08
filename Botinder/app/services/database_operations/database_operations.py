@@ -13,8 +13,6 @@ from app.models.matches import MatchBase, RobotMatches, UserMatches
 from app.models.messages import UserMessage
 from app.models.robots import RobotProfile, UserRobot
 from app.models.user import Profile, User, UserCriteria
-from app.services.geolocalization_services.user_localization_and_distance import \
-    get_coordinates
 
 
 @contextmanager
