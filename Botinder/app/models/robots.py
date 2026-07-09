@@ -1,8 +1,7 @@
 from geoalchemy2 import Geography
 from sqlalchemy import Column, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
-
-from app.models import Base
+from app.database import Base
 
 
 class UserRobotBase(Base):

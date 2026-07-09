@@ -1,11 +1,8 @@
 import json
 import random
 from random import uniform
-
 from faker import Faker
 from geopy.distance import great_circle
-
-from app.models import Session
 from app.services.database_operations.database_operations import *
 from app.services.database_operations.database_operations import session_scope
 

@@ -63,7 +63,7 @@ services:
     build:
       context: ./Botinder
     container_name: botinder_huey_worker
-    command: python -m huey.bin.huey_consumer app.huey
+    command: python -m huey.bin.huey_consumer app.extensions.huey
     environment:
       - DATABASE_URL=postgresql://botinder_user:botinder_secure_password@db:5432/botinder_web
       - REDIS_URL=redis://redis:6379/0
@@ -73,6 +73,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-
+        
 volumes:
   postgres_data:

@@ -1,7 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
-
-from app.models import Base
+from app.database import Base
 
 
 class MatchBase(Base):

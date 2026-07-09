@@ -4,7 +4,6 @@ from geopy.distance import geodesic
 from ip2geotools.databases.noncommercial import DbIpCity
 from flask import has_request_context, request, current_app
 from pathlib import Path
-
 from app.services.API_requests.requests import (
     get_botinderAPI_coordinates,
     get_botinderAPI_distance
