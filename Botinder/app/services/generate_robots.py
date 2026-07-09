@@ -1,17 +1,21 @@
 import json
 import random
 from random import uniform
+from pathlib import Path
 from faker import Faker
 from geopy.distance import great_circle
-from app.services.database_operations.database_operations import *
-from app.services.database_operations.database_operations import session_scope
+from geoalchemy2.elements import WKTElement
+from app.models.robots import UserRobot, RobotProfile
 
-with open(
-    "app/services/database_operations/robots_generator/descriptions.json",
-    "r",
-    encoding="utf-8",
-) as robots_descriptions:
-    r_descriptions = json.load(robots_descriptions)
+CURRENT_DIR = Path(__file__).resolve().parent.parent
+DESCRIPTIONS_PATH = CURRENT_DIR / "data" / "descriptions.json"
+
+try:
+    with open(DESCRIPTIONS_PATH, "r", encoding="utf-8") as robots_descriptions:
+        r_descriptions = json.load(robots_descriptions)
+except Exception as e:
+    print(f"Błąd ładowania pliku descriptions.json pod ścieżką {DESCRIPTIONS_PATH}: {e}")
+    r_descriptions = ["Jestem zaawansowanym robotem pomocniczym."]
 
 
 def generate_random_location_within_radius(user_location, radius_km=50):
@@ -22,7 +26,6 @@ def generate_random_location_within_radius(user_location, radius_km=50):
     return new_location.latitude, new_location.longitude
 
 
-# I need this function to generate robots and simulate search in database full of robots like 5000 robots
 def generate_random_robots(
     start=0, number_of_robots=20, user_location=None, user=None, session=None
 ):
@@ -37,7 +40,6 @@ def generate_random_robots(
             longitude = random.uniform(-180, 180)
 
         robot_location = WKTElement(f"POINT({longitude} {latitude})", srid=4326)
-
         name = fake.first_name()
 
         type_of_robot = ["humanoid", "non-humanoid"]

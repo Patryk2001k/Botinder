@@ -16,14 +16,13 @@ class GeolocalizationService:
     def _load_cities(cls) -> dict:
         """Ładuje bazę miast z pliku JSON w sposób leniwy (lazy load)."""
         if cls._cities_cache is None:
-            current_dir = Path(__file__).resolve().parent
-            # Scieżka do pliku cities.JSON w oryginalnej lokalizacji
-            cities_path = current_dir / "geolocalization_services" / "cities.JSON"
+            current_dir = Path(__file__).resolve().parent.parent
+            cities_path = current_dir / "data" / "cities.json"
             try:
                 with open(cities_path, "r", encoding="utf-8") as f:
                     cls._cities_cache = json.load(f)
             except Exception as e:
-                print(f"Błąd ładowania pliku cities.JSON pod ścieżką {cities_path}: {e}")
+                print(f"Błąd ładowania pliku cities.json pod ścieżką {cities_path}: {e}")
                 cls._cities_cache = {}
         return cls._cities_cache
 

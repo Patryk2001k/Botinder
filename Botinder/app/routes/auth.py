@@ -1,8 +1,9 @@
 from flask import Blueprint, flash, redirect, render_template, url_for
 from flask_login import login_required, login_user, logout_user
 from geoalchemy2.elements import WKTElement
-from app.services.database_operations.database_operations import (
-UserObject, get_user, insert_user_and_user_profile, session_scope)
+from app.services.database_operations import (
+        UserObject, get_user, insert_user_and_user_profile,
+        session_scope)
 from app.services.geolocalization import GeolocalizationService
 from app.services.image_upload import get_image
 from app.forms.auth import LoginForm, RegistrationForm

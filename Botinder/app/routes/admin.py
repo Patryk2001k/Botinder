@@ -8,7 +8,7 @@ admin_bp = Blueprint('admin', __name__)
 @admin_bp.route("/admin_site", methods=["GET", "POST"])
 @login_required
 def admin_site():
-    from app.services.database_operations.database_operations import (
+    from app.services.database_operations import (
         insert_into_robots_db, session_scope)
     from app.services.image_upload import get_image
 

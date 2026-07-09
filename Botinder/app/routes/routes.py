@@ -121,7 +121,7 @@ def get_robots():
 
 @main_bp.route("/get_geolocation", methods=["GET", "POST"])
 def get_geolocation():
-    from app.services.database_operations.database_operations import (
+    from app.services.database_operations import (
         get_user, session_scope, update_user_location, update_user_location_domicile
     )
     data = request.get_json()

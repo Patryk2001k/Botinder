@@ -1,7 +1,7 @@
 from geoalchemy2.shape import to_shape
 from geopy.distance import geodesic
 
-from app.services.database_operations.database_operations import (
+from app.services.database_operations import (
     get_not_matched_robots_by_localization, get_user_criteria, session_scope)
 
 MINIMUM_MATCHED_ROBOTS = MINIMUM_NOT_MATCHED_ROBOTS = 10

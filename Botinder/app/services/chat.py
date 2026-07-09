@@ -1,10 +1,10 @@
-from app.services.database_operations.database_operations import (
+from app.services.database_operations import (
     session_scope, get_matched_robots, get_robot_info_by_chatroom_id,
     get_chatroom_messages, add_match_unmatch, delete_chatroom, delete_matched_pair,
     add_message_to_chatroom
 )
 from app.models.matches import UnMatches
-from app.services.tasks.tasks import calL_GPT_API
+from app.services.tasks import calL_GPT_API
 
 class ChatService:
     @classmethod
