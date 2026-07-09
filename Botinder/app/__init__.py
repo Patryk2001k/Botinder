@@ -5,9 +5,11 @@ from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_socketio import SocketIO
+from flask_uploads import configure_uploads  # POPRAWKA: Import konfiguratora
 from huey import RedisHuey
 
 from app.config import Config
+from app.services.image_upload import photos  # POPRAWKA: Import zestawu zdjęć
 
 # Inicjalizacja rozszerzeń (globalna, niepowiązana jeszcze z instancją aplikacji)
 bcrypt = Bcrypt()
@@ -26,6 +28,9 @@ def create_app(config_class=Config):
     bcrypt.init_app(app)
     login_manager.init_app(app)
     socketio.init_app(app)
+    
+    # POPRAWKA: Powiązanie wtyczki przesyłania plików z aplikacją
+    configure_uploads(app, photos)
 
     # Konfiguracja managera logowania
     login_manager.login_view = 'auth.login'
