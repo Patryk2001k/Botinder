@@ -1,15 +1,19 @@
-from flask import Blueprint, jsonify, redirect, render_template, request, url_for
+from flask import Blueprint, jsonify, redirect, render_template, request, url_for, current_app
 from flask_login import current_user, login_required
 
+# Wszystkie importy przeniesione na samą górę pliku
 from app.services.matchmaking import MatchmakingService
 from app.services.chat import ChatService
+from app.services.database_operations import (
+    get_user, session_scope, update_user_location, update_user_location_domicile
+)
 
 main_bp = Blueprint('main', __name__)
+
 
 @main_bp.route("/")
 @main_bp.route("/home")
 def home():
-    from flask import current_app
     current_app.config['STATIC_USER_IP'] = request.remote_addr
     
     if current_user.is_authenticated:
@@ -30,7 +34,6 @@ def FAQ():
 @main_bp.route("/user_homepage", methods=["GET"])
 @login_required
 def user_homepage():
-    # Delegujemy całe przetwarzanie danych do MatchmakingService
     robots_list = MatchmakingService.get_candidate_robots(current_user)
     matched_robots = MatchmakingService.get_matches(current_user)
     
@@ -121,9 +124,6 @@ def get_robots():
 
 @main_bp.route("/get_geolocation", methods=["GET", "POST"])
 def get_geolocation():
-    from app.services.database_operations import (
-        get_user, session_scope, update_user_location, update_user_location_domicile
-    )
     data = request.get_json()
     latitude = data.get("latitude")
     longitude = data.get("longitude")

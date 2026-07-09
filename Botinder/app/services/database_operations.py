@@ -14,8 +14,6 @@ from app.models.user import Profile, User, UserCriteria
 
 @contextmanager
 def session_scope():
-    """Context manager zapewniający bezpieczne transakcje."""
-    # Tworzymy czystą, nową sesję dla operacji serwisowych
     local_session = Session()
     try:
         yield local_session
@@ -30,21 +28,20 @@ def session_scope():
 class UserObject:
     def __init__(self, name):
         self.name = name
-        # POPRAWKA: Nie zamykamy sesji ręcznie w konstruktorze!
         self.user = session.query(User).filter_by(name=name).first()
 
     def user_exists(self):
         return self.user is not None
 
     def password_exists(self, password):
-        from app.extensions import bcrypt
+        # POPRAWKA: Brak lokalnego importu bcrypt (jest już na górze pliku!)
         users = session.query(User).all()
         password_exists = False
         for user in users:
             if bcrypt.check_password_hash(user.password, password):
                 password_exists = True
                 break
-        return password_exists  # POPRAWKA: Usunięto stwardniałe session.close()
+        return password_exists
 
     def check_user_in_db_registration(self, password):
         return self.user_exists() or self.password_exists(password)
