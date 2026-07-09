@@ -1,15 +1,13 @@
 from datetime import datetime
+from os import environ
 
 from flask_login import LoginManager, UserMixin
 from geoalchemy2 import Geography
 from sqlalchemy import (Boolean, Column, Enum, ForeignKey, Integer, MetaData,
                         String, create_engine, text)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import relationship, sessionmaker, scoped_session # POPRAWKA: Import scoped_session
 from sqlalchemy_utils import create_database, database_exists
-from os import environ
-# from sqlalchemy.dialects.postgresql import UUID #UUID for the future
-# import uuid
 
 Base = declarative_base()
 metadata = MetaData()
@@ -34,5 +32,6 @@ from app.models.user import *
 
 Base.metadata.create_all(bind=engine)
 
+# POPRAWKA: Tworzymy fabrykę sesji i powiązujemy ją z mechanizmem scoped_session
 Session = sessionmaker(bind=engine)
-session = Session()
+session = scoped_session(Session) # Gwarantuje bezpieczeństwo wątkowe (Thread-safety)

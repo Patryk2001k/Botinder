@@ -36,6 +36,11 @@ def create_app(config_class=Config):
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Zaloguj się, aby uzyskać dostęp do tej strony.'
 
+    @app.teardown_appcontext
+    def shutdown_session(exception=None):
+        from app.models import session
+        session.remove()
+
     # Rejestracja Blueprintów (Modułów aplikacji)
     from app.routes.routes import main_bp
     from app.routes.auth import auth_bp

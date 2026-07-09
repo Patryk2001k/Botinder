@@ -4,9 +4,9 @@ from geoalchemy2.elements import WKTElement
 from geoalchemy2.functions import ST_DWithin
 from geoalchemy2.shape import to_shape
 from sqlalchemy import and_, asc, exists, not_, or_
-from sqlalchemy.orm import aliased, joinedload, sessionmaker
+from sqlalchemy.orm import aliased, joinedload
 
-from app.models import Session, engine, session
+from app.models import Session, engine, session # session jest teraz scoped_session
 from app.models.chatroom import ChatRoom
 from app.models.matches import MatchBase, RobotMatches, UserMatches
 from app.models.messages import UserMessage
@@ -16,36 +16,37 @@ from app.models.user import Profile, User, UserCriteria
 
 @contextmanager
 def session_scope():
-    session = Session()
+    """Context manager zapewniający bezpieczne transakcje."""
+    # Tworzymy czystą, nową sesję dla operacji serwisowych
+    local_session = Session()
     try:
-        yield session
-        session.commit()
-    except:
-        session.rollback()
+        yield local_session
+        local_session.commit()
+    except Exception:
+        local_session.rollback()
         raise
     finally:
-        session.close()
+        local_session.close()
 
 
 class UserObject:
     def __init__(self, name):
         self.name = name
+        # POPRAWKA: Nie zamykamy sesji ręcznie w konstruktorze!
         self.user = session.query(User).filter_by(name=name).first()
-        session.close()
 
     def user_exists(self):
         return self.user is not None
 
     def password_exists(self, password):
-        from app import bcrypt
+        from app import bcrypt  # Import lokalny zapobiegający cyklom
         users = session.query(User).all()
         password_exists = False
         for user in users:
             if bcrypt.check_password_hash(user.password, password):
                 password_exists = True
                 break
-        session.close()
-        return password_exists
+        return password_exists  # POPRAWKA: Usunięto stwardniałe session.close()
 
     def check_user_in_db_registration(self, password):
         return self.user_exists() or self.password_exists(password)
