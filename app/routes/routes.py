@@ -67,9 +67,8 @@ def match():
     )
     
     if match_result:
-        # POPRAWKA: asdict() automatycznie i czysto konwertuje MatchResultDTO do słownika JSON
         return jsonify({"message": "Success", "match_result": asdict(match_result)}), 200
-    return jsonify({"message": "No match"}), 200
+    return jsonify({"message": "No match"}), 400
 
 
 @main_bp.route("/chatroom/<chatroom_id>")

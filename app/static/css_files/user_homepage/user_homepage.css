@@ -79,10 +79,11 @@ body{
     border-bottom: 2px solid;
 }
 
-.main-match-users-menu{
+.main-match-users-menu {
     display: flex;
-    flex-wrap: wrap;  /* Poprawka tutaj */
+    flex-wrap: wrap;
     align-items: flex-start;
+    align-content: flex-start;  /* POPRAWKA: Rzędy będą układać się ciasno od góry */
     width: 100%;
     height: 90%;
     overflow-y: auto;
