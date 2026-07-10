@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, redirect, render_template, request, url_for, current_app
+from flask import Blueprint, jsonify, redirect, render_template, request, url_for, current_app, flash
 from flask_login import current_user, login_required
 from dataclasses import asdict  # IMPORT ASDICT dla serializacji DTO
 
@@ -76,6 +76,11 @@ def match():
 def chatroom(chatroom_id):
     chat_context = ChatService.get_chatroom_context(current_user, int(chatroom_id))
     
+    if not chat_context.robot_info:
+        flash("This chatroom no longer exists or has been deleted.")
+        return redirect(url_for("main.user_homepage"))
+    
+
     return render_template(
         "user_homepage/chatroom.html",
         chatroom_id=chatroom_id,

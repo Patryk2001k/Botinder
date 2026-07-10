@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-
+from logging import getLogger, info, warning
 from geoalchemy2.elements import WKTElement
 from geoalchemy2.functions import ST_DWithin
 from geoalchemy2.shape import to_shape
@@ -348,16 +348,19 @@ def delete_chatroom(session, chatroom_id):
     if chatroom_to_delete:
         session.delete(chatroom_to_delete)
         session.commit()
-        logger.info(f"Chatroom with ID {chatroom_id} has been deleted.")
+        info(f"Chatroom with ID {chatroom_id} has been deleted.")
     else:
-        logger.warning(f"Chatroom with ID {chatroom_id} not found for deletion.")
+        warning(f"Chatroom with ID {chatroom_id} not found for deletion.")
 
 
 def delete_matched_pair(session, user_name, robot_name):
-    user = session.query(User).filter(User.name == user_name).first()
+    user = session.query(User).filter(
+        or_(User.username == user_name, User.name == user_name)
+    ).first()
     robot = session.query(UserRobot).filter(UserRobot.name == robot_name).first()
 
     if not user or not robot:
+        warning(f"Could not find user '{user_name}' or robot '{robot_name}' during unmatch operation.")
         return
 
     user_match = (
@@ -376,8 +379,8 @@ def delete_matched_pair(session, user_name, robot_name):
         session.delete(user_match)
         session.delete(robot_match)
         session.commit()
-        logger.info(f"Successfully unmatched pair: User '{user_name}' and Robot '{robot_name}'.")
+        info(f"Successfully unmatched pair: User '{user_name}' and Robot '{robot_name}'.")
     else:
-        logger.warning(
+        warning(
             f"Match record not found in database for User '{user_name}' and Robot '{robot_name}' during unmatch operation."
         )
