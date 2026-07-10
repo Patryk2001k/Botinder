@@ -5,10 +5,7 @@ from geoalchemy2.elements import WKTElement
 
 from app.forms.auth import LoginForm, RegistrationForm
 from app.services.database_operations import get_user, insert_user_and_user_profile, session_scope
-from app.services.geolocalization import GeolocalizationService
-from app.services.image_upload import get_image
 
-# POPRAWKA: Inicjalizacja profesjonalnego loggera
 logger = logging.getLogger(__name__)
 
 auth_bp = Blueprint('auth', __name__)
@@ -16,6 +13,9 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
+    from app.services.geolocalization import GeolocalizationService
+    from app.services.image_upload import get_image
+
     form = RegistrationForm()
     if form.validate_on_submit():
         logger.info(f"Attempting to register user: {form.username.data}")
@@ -41,7 +41,8 @@ def register():
                 session,
             )
 
-            user = get_user(session, form.name.data)
+            # POPRAWKA: Pobieramy nowo zarejestrowanego użytkownika po jego unikalnym LOGINIE (username)
+            user = get_user(session, form.username.data)
             login_user(user)
             
             domicile_longitude_and_latitude = GeolocalizationService.get_coordinates(form.domicile.data)
@@ -56,7 +57,6 @@ def register():
             logger.info(f"User {form.username.data} registered and logged in successfully.")
             return redirect(url_for("auth.check_user_location"))
     else:
-        # Rejestrujemy błędy walidacji w logach serwera w języku angielskim
         if form.is_submitted():
             logger.warning(f"Registration validation failed. Errors: {form.errors}")
             
@@ -69,27 +69,28 @@ def register():
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
-    from app.services.database_operations import UserObject  # Pobieramy lokalnie tylko na potrzeby logowania
+    from app.services.database_operations import UserObject
     
     form = LoginForm()
     if form.validate_on_submit():
-        logger.info(f"User {form.name.data} is attempting to log in.")
-        user = UserObject(form.name.data)
+        # POPRAWKA: Logowanie oparte na unikalnym LOGINIE (form.username.data)
+        logger.info(f"User {form.username.data} is attempting to log in.")
+        user = UserObject(form.username.data)
         
         with session_scope() as session:
-            user_log = get_user(session, form.name.data)
+            user_log = get_user(session, form.username.data)
             if user.check_user_in_db_login(form.password.data) and not user.is_admin():
                 login_user(user_log)
-                logger.info(f"User {form.name.data} logged in successfully.")
+                logger.info(f"User {form.username.data} logged in successfully.")
                 return redirect(url_for("auth.check_user_location"))
 
             elif user.is_admin():
                 login_user(user_log)
-                logger.info(f"Administrator {form.name.data} logged in successfully.")
+                logger.info(f"Administrator {form.username.data} logged in successfully.")
                 return redirect(url_for("admin.admin_site"))
 
             else:
-                logger.warning(f"Failed login attempt for user: {form.name.data} (User does not exist or wrong password).")
+                logger.warning(f"Failed login attempt for user: {form.username.data} (User does not exist or wrong password).")
                 flash("Użytkownik nie istnieje")
                 return render_template("auth/login.html", form=form)
 

@@ -26,7 +26,7 @@ class UserMatches(MatchBase):
     }
 
     user = relationship("User", back_populates="user_matches")
-    robot = relationship("UserRobot", back_populates="robot_matches")
+    robot = relationship("UserRobot", back_populates="user_matches")
 
     def __repr__(self):
         return f"UserMatch('{self.user_id}', '{self.robot_id}', '{self.user_name}', '{self.robot_name}')"

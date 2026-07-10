@@ -8,36 +8,36 @@ logger = getLogger(__name__)
 
 Base = declarative_base()
 
+# POPRAWKA (PEP 8): Importujemy wszystkie modele na poziomie modułu pod obiektem Base
+from app.models.chatroom import ChatRoom
+from app.models.matches import MatchBase, RobotMatches, UnMatches, UserMatches
+from app.models.messages import UserMessage
+from app.models.robots import RobotProfile, UserRobot
+from app.models.user import Profile, User, UserCriteria
+
 DB_URL = environ.get(
     "DATABASE_URL", 
-    "postgresql://botinder_user:botinder_secure_password@db:5432/botinder_web"
+    "postgresql://botinder_user:botinder_secure_password@db:5432/botinder"
 )
 
-engine = create_engine(DB_URL, echo=False)  # POPRAWKA: wyłączamy echo silnika SQLAlchemy, by nie śmieciło w logach
+engine = create_engine(DB_URL, echo=False)
 
-# Sprawdzenie istnienia bazy i wstrzyknięcie rozszerzeń PostGIS
 if not database_exists(engine.url):
     create_database(engine.url)
-    logger.info("Database did not exist. Successfully created a new one.")  # POPRAWKA: log po angielsku
+    logger.info("Database did not exist. Successfully created a new one.")
 
 with engine.connect() as connection:
     connection.execute(text('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'))
     connection.execute(text('CREATE EXTENSION IF NOT EXISTS "postgis";'))
     connection.commit()
 
-Session = sessionmaker(bind=engine)
+Session = sessionmaker(bind=engine, expire_on_commit=False)
 db_session = scoped_session(Session)
 
-# Alias dla kompatybilności importów sesji
 session = db_session
 
-def init_db():
-    """Importuje modele, aby zarejestrować je w metadanych Base, i tworzy tabele."""
-    from app.models.chatroom import ChatRoom
-    from app.models.matches import MatchBase, RobotMatches, UnMatches, UserMatches
-    from app.models.messages import UserMessage
-    from app.models.robots import RobotProfile, UserRobot
-    from app.models.user import Profile, User, UserCriteria
-    
+
+def init_db() -> None:
+    """Tworzy tabele w bazie danych (wywoływane w fabryce aplikacji)."""
     Base.metadata.create_all(bind=engine)
-    logger.info("Database schemas and PostGIS extensions initialized.")  # POPRAWKA: log po angielsku
+    logger.info("Database schemas and PostGIS extensions initialized.")

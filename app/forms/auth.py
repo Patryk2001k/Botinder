@@ -88,6 +88,6 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    name = StringField("name", validators=[DataRequired()])
+    username = StringField("username", validators=[DataRequired()])
     password = PasswordField("password", validators=[DataRequired()])
     submit_field = SubmitField("Log in")

@@ -66,7 +66,7 @@
                 <div class="user-message-information">
                     <div class="user-information" x-data="{{user}}">{{user}} i {{robot_info.profile_robot.name}} użytkownik zmatchowali się w celu przyszłych dobrych chwil</div>
                     <div class="user-information-image">
-                        <a href="{{ url_for('auth.user_homepage') }}">
+                        <a href="{{ url_for('main.user_homepage') }}">
                             <img src="{{url_for('static', filename='images/icons/x-mark.png')}}" class="user-information-image-x-mark">
                         </a>
                     </div>

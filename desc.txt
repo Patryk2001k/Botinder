@@ -1,0 +1,8 @@
+Dane do logowania do kont testowych:
+Konto dla Warszawy:
+Login (Username): user_warszawa
+Hasło: password123
+
+Konto dla Krakowa:
+Login (Username): user_krakow
+Hasło: password123
