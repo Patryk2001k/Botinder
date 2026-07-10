@@ -10,7 +10,9 @@ from app.models.matches import MatchBase, RobotMatches, UserMatches
 from app.models.messages import UserMessage
 from app.models.robots import RobotProfile, UserRobot
 from app.models.user import Profile, User, UserCriteria
+import logging  # IMPORT LOGGING
 
+logger = logging.getLogger(__name__)
 
 @contextmanager
 def session_scope():
@@ -355,9 +357,9 @@ def delete_chatroom(session, chatroom_id):
     if chatroom_to_delete:
         session.delete(chatroom_to_delete)
         session.commit()
-        print(f"Chatroom with ID {chatroom_id} has been deleted.")
+        logger.info(f"Chatroom with ID {chatroom_id} has been deleted.")  # POPRAWKA: log po angielsku
     else:
-        print(f"Chatroom with ID {chatroom_id} not found.")
+        logger.warning(f"Chatroom with ID {chatroom_id} not found for deletion.")  # POPRAWKA: log po angielsku
 
 
 def delete_matched_pair(session, user_name, robot_name):
@@ -383,7 +385,8 @@ def delete_matched_pair(session, user_name, robot_name):
         session.delete(user_match)
         session.delete(robot_match)
         session.commit()
+        logger.info(f"Successfully unmatched pair: User '{user_name}' and Robot '{robot_name}'.")  # POPRAWKA: log po angielsku
     else:
-        print(
-            f"Match not found in both UserMatches and RobotMatches for User '{user_name}' and Robot '{robot_name}'."
+        logger.warning(
+            f"Match record not found in database for User '{user_name}' and Robot '{robot_name}' during unmatch operation." # POPRAWKA: log po angielsku
         )

@@ -1,11 +1,16 @@
 import json
 import random
+import logging  # IMPORT LOGGING
 from random import uniform
 from pathlib import Path
+
 from faker import Faker
 from geopy.distance import great_circle
 from geoalchemy2.elements import WKTElement
+
 from app.models.robots import UserRobot, RobotProfile
+
+logger = logging.getLogger(__name__)  # LOGGER INSTANCE
 
 CURRENT_DIR = Path(__file__).resolve().parent.parent
 DESCRIPTIONS_PATH = CURRENT_DIR / "data" / "descriptions.json"
@@ -14,8 +19,8 @@ try:
     with open(DESCRIPTIONS_PATH, "r", encoding="utf-8") as robots_descriptions:
         r_descriptions = json.load(robots_descriptions)
 except Exception as e:
-    print(f"Błąd ładowania pliku descriptions.json pod ścieżką {DESCRIPTIONS_PATH}: {e}")
-    r_descriptions = ["Jestem zaawansowanym robotem pomocniczym."]
+    logger.error(f"Failed to load descriptions.json from {DESCRIPTIONS_PATH}: {e}", exc_info=True)  # POPRAWKA
+    r_descriptions = ["I am an advanced support android robot."]  # POPRAWKA: po angielsku
 
 
 def generate_random_location_within_radius(user_location, radius_km=50):
@@ -29,6 +34,7 @@ def generate_random_location_within_radius(user_location, radius_km=50):
 def generate_random_robots(
     start=0, number_of_robots=20, user_location=None, user=None, session=None
 ):
+    logger.info(f"Generating {number_of_robots} random robots for matchmaking database...")  # POPRAWKA
     fake = Faker()
     for i in range(start, number_of_robots):
         if user_location is not None and user.user_criteria.distance is not None:
@@ -74,3 +80,4 @@ def generate_random_robots(
         )
 
         session.add(robot_profile)
+    logger.info("Successfully populated database with random robots.")  # POPRAWKA

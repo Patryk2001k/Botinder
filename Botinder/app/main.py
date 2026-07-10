@@ -1,3 +1,4 @@
+import logging  # IMPORT LOGGING
 from flask import Flask
 from flask_uploads import configure_uploads
 
@@ -7,6 +8,14 @@ from app.services.image_upload import photos
 from app.database import db_session, init_db
 
 def create_app(config_class=Config):
+    # POPRAWKA: Konfiguracja formatowania i poziomu logów na konsoli
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+    )
+    logger = logging.getLogger(__name__)
+    logger.info("Initializing Botinder application...")
+
     app = Flask(__name__)
     app.config.from_object(config_class)
 
@@ -20,7 +29,7 @@ def create_app(config_class=Config):
 
     # Konfiguracja login managera
     login_manager.login_view = 'auth.login'
-    login_manager.login_message = 'Zaloguj się, aby uzyskać dostęp do tej strony.'
+    login_manager.login_message = 'Please log in to access this page.'  # POPRAWKA: po angielsku
 
     # Inicjalizacja tabel bazodanowych
     init_db()
@@ -41,6 +50,7 @@ def create_app(config_class=Config):
     app.register_blueprint(admin_bp)
     app.register_blueprint(errors_bp)
 
+    logger.info("Botinder application started successfully.")
     return app
 
 

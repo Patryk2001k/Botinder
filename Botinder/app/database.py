@@ -1,7 +1,10 @@
 import os
+import logging  # IMPORT LOGGING
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker, scoped_session
 from sqlalchemy_utils import create_database, database_exists
+
+logger = logging.getLogger(__name__)  # LOGGER INSTANCE
 
 Base = declarative_base()
 
@@ -10,12 +13,12 @@ DB_URL = os.environ.get(
     "postgresql://botinder_user:botinder_secure_password@db:5432/botinder_web"
 )
 
-engine = create_engine(DB_URL, echo=True)
+engine = create_engine(DB_URL, echo=False)  # POPRAWKA: wyłączamy echo silnika SQLAlchemy, by nie śmieciło w logach
 
 # Sprawdzenie istnienia bazy i wstrzyknięcie rozszerzeń PostGIS
 if not database_exists(engine.url):
     create_database(engine.url)
-    print("Database was created.")
+    logger.info("Database did not exist. Successfully created a new one.")  # POPRAWKA: log po angielsku
 
 with engine.connect() as connection:
     connection.execute(text('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'))
@@ -37,3 +40,4 @@ def init_db():
     from app.models.user import Profile, User, UserCriteria
     
     Base.metadata.create_all(bind=engine)
+    logger.info("Database schemas and PostGIS extensions initialized.")  # POPRAWKA: log po angielsku
