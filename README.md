@@ -57,8 +57,6 @@ docker-compose up --build
 After successfully starting the containers and waiting about 15-20 seconds for table initialization and automatic data seeding, the main application becomes available at:
 http://localhost:5000
 
-The database automatically generates 100 robot profiles and two ready-made user accounts for demonstration purposes:
-
 ### Warsaw Profile (Jan Kowalski)
 - Login: user_warszawa (alternatively first name: Jan)
 - Password: password123
