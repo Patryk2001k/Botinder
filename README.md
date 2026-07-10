@@ -50,10 +50,6 @@ To force a clean build of the application images and start the services in the b
 ```bash
 docker-compose up --build
 ```
-
-**3. Automatic code reload mode (Live-Reload)**
-The docker-compose.yml configuration uses volume mapping in the `.:/app` format. This means that any modification made to Python source files (.py) or view templates (.html) on your local machine is immediately reflected in the running container. There is no need to rebuild images during development.
-
 ---
 
 ## Login Credentials and Test Environment
