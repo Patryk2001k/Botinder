@@ -1,9 +1,8 @@
-from json import load  # JAWNY IMPORT
 from logging import getLogger  # JAWNY IMPORT
-from pathlib import Path
+from os import environ  # JAWNY IMPORT
 import country_converter as coco
 from geopy.distance import geodesic
-from geopy.geocoders import Nominatim  # POPRAWKA: Importujemy Nominatim lokalnie
+from geopy.geocoders import Nominatim
 from ip2geotools.databases.noncommercial import DbIpCity
 from flask import has_request_context, request, current_app
 
@@ -12,25 +11,6 @@ from app.services.dtos import LocationInfoDTO
 logger = getLogger(__name__)
 
 class GeolocalizationService:
-    _cities_cache = None
-
-    @classmethod
-    def _load_cities(cls) -> dict:
-        if cls._cities_cache is None:
-            current_dir = Path(__file__).resolve().parent.parent
-            cities_path = current_dir / "data" / "cities.json"
-            
-            if not cities_path.exists():
-                cities_path = current_dir / "data" / "cities.JSON"
-                
-            try:
-                with open(cities_path, "r", encoding="utf-8") as f:
-                    cls._cities_cache = load(f)
-                logger.info(f"Successfully loaded cities database from: {cities_path}")
-            except Exception as e:
-                logger.error(f"Failed to load cities file from path {cities_path}: {e}", exc_info=True)
-                cls._cities_cache = {}
-        return cls._cities_cache
 
     @classmethod
     def get_ip(cls) -> str:
@@ -68,25 +48,8 @@ class GeolocalizationService:
             )
 
     @classmethod
-    def get_cities(cls) -> list[str]:
-        try:
-            location = cls.get_location_info()
-            country_code = location.country
-            
-            cities_db = cls._load_cities()
-            if not country_code or country_code not in cities_db:
-                country_code = "PL"
-                
-            cities_with_country_code = cities_db.get(country_code, [])
-            return [city["name"] for city in cities_with_country_code]
-        except Exception as e:
-            logger.error(f"Failed to generate cities list (falling back to defaults): {e}")
-            return ["Warszawa", "Kraków", "Wrocław", "Poznań", "Gdańsk", "Łódź"]
-
-    @classmethod
     def get_coordinates(cls, city_name: str) -> list[float]:
         """Konwertuje nazwę miasta na współrzędne geograficzne NATYWNIE przy użyciu geopy."""
-        # Unikalny User-Agent chroni nas przed błędem 403 z serwerów OSM
         geolocator = Nominatim(user_agent="Botinder_App_Decoupled_Monolith_Client_2026")
         try:
             location = geolocator.geocode(city_name, timeout=10)

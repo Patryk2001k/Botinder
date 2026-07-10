@@ -5,9 +5,7 @@ from wtforms import (EmailField, IntegerField, PasswordField, SelectField,
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
 from app.forms.utils import enum_to_choices
-# POPRAWKA: Importujemy oba enumy statusu zatrudnienia (Criteria oraz Profile)
 from app.models.enums import EmploymentStatusCriteria, EmploymentStatusProfile, Gender, RobotType
-from app.services.geolocalization import GeolocalizationService
 from app.database import db_session
 from app.models.user import User
 
@@ -20,7 +18,6 @@ class RegistrationForm(FlaskForm):
     type_of_robot = SelectField("type of robot", validators=[DataRequired()], choices=enum_to_choices(RobotType, replace=True))
     distance = IntegerField("distance", validators=[DataRequired()])
     
-    # POPRAWKA: Prawidłowe użycie EmploymentStatusCriteria dla kryteriów wyszukiwania
     employment_status_criteria = SelectField(
         "employment status criteria", 
         validators=[DataRequired()], 
@@ -32,10 +29,11 @@ class RegistrationForm(FlaskForm):
     lastname = StringField("lastname", validators=[DataRequired()])
     gender = SelectField("gender", validators=[DataRequired()], choices=enum_to_choices(Gender, replace=True))
     profile_description = TextAreaField("profile description", validators=[DataRequired()])
-    domicile = SelectField("domicile", validators=[DataRequired()])
-    education = StringField("education", validators=[DataRequired()])
     
-    # Prawidłowe użycie EmploymentStatusProfile dla profilu użytkownika
+    # OPCJA A: Zmiana SelectField na StringField (pole tekstowe)
+    domicile = StringField("domicile", validators=[DataRequired()])
+    
+    education = StringField("education", validators=[DataRequired()])
     employment_status_profile = SelectField("employment status profile", validators=[DataRequired()], choices=enum_to_choices(EmploymentStatusProfile, replace=True))
     
     photo = FileField(
@@ -45,10 +43,6 @@ class RegistrationForm(FlaskForm):
         ]
     )
     submit_field = SubmitField("Join today")
-
-    def __init__(self, *args, **kwargs):
-        super(RegistrationForm, self).__init__(*args, **kwargs)
-        self.domicile.choices = [(city, city) for city in GeolocalizationService.get_cities()]
 
     def validate_username(self, username):
         user = db_session.query(User).filter_by(username=username.data).first()
@@ -74,6 +68,23 @@ class RegistrationForm(FlaskForm):
         for user in users:
             if bcrypt.check_password_hash(user.password, password.data):
                 raise ValidationError("For security reasons, this password cannot be used as it is already registered by another user.")
+
+    # ŚCIEŻKA 2 (Walidator poprawności wpisanego miasta w geopy):
+    def validate_domicile(self, domicile):
+        """Sprawdza przed rejestracją, czy wpisane miasto fizycznie istnieje na mapie."""
+        from geopy.geocoders import Nominatim
+        
+        geolocator = Nominatim(user_agent="Botinder_App_Validation_Client_2026")
+        try:
+            location = geolocator.geocode(domicile.data, timeout=5)
+            if not location:
+                raise ValidationError("We couldn't find this city. Please enter a valid, existing city name.")
+        except ValidationError:
+            raise
+        except Exception:
+            # Zabezpieczenie awaryjne (Fail-safe): 
+            # W przypadku awarii zewnętrznego serwera Nominatima, przepuszczamy formularz dalej.
+            pass
 
 
 class LoginForm(FlaskForm):
