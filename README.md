@@ -1,12 +1,13 @@
 # Botinder ![](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) ![](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white) ![](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white) ![](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white) ![](https://img.shields.io/badge/Postgresql-07405E?style=for-the-badge&logo=postgresql&logoColor=white) ![](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black) 
-Botinder to aplikacja internetowa stworzona z przymrużeniem oka, której głównym zadaniem jest łączenie ludzi z robotami w sposób inspirowany popularnymi platformami randkowymi. Projekt przeszedł gruntowną refaktoryzację kodu zgodnie z zasadami Clean Code i został w pełni skonteneryzowany za pomocą Dockera, łącząc dawną aplikację webową oraz dedykowany moduł API w jedno spójne środowisko (Monorepo).
 
-## Koncepcja i cele projektu
+Botinder is a tongue-in-cheek web application whose main purpose is connecting humans with robots, inspired by popular dating platforms. The project has undergone a thorough code refactoring in accordance with Clean Code principles and has been fully containerized using Docker, merging the legacy web application and a dedicated API module into a single, cohesive environment (Monorepo).
 
-Projekt powstał jako humorystyczna symulacja aplikacji randkowej dla ludzi i maszyn. Do głównych założeń systemu należą:
-- Możliwość rejestracji, logowania oraz zarządzania profilem użytkownika (w tym przesyłanie zdjęcia profilowego).
-- Przeglądanie profili, ocenianie ich i dopasowywanie ludzi z robotami na podstawie lokalizacji.
-- Dwukierunkowa komunikacja i możliwość natychmiastowej wymiany wiadomości czatowych z dopasowanymi botami.
+## Concept and Project Goals
+
+The project was created as a humorous simulation of a dating app for humans and machines. The main features of the system include:
+- User registration, login, and profile management (including profile picture uploads).
+- Browsing profiles, rating them, and matching humans with robots based on location.
+- Two-way communication and the ability to instantly exchange chat messages with matched bots.
 
 # frameworks and technologies:
 - <a href="https://www.sqlalchemy.org/" alt="sqlalchemy">sqlalchemy</a> (to store information in database i am using Postgresql)
@@ -18,62 +19,62 @@ Projekt powstał jako humorystyczna symulacja aplikacji randkowej dla ludzi i ma
 - of course i use basic stuff like HTML, CSS, JS and jinja2, <a href="https://getbootstrap.com/" alt="Boostrap">Boostrap</a> 
 - <a href="https://alpinejs.dev/" alt="alpine.js">alpine.js</a> (i used this js framework to simple stuff with html, in shortcut this framework can do dynamic html in simple way and i think it is good for small projects)
   
-### 1. Aplikacja Główna (Flask)
-Obsługuje interfejs użytkownika, sesje, uwierzytelnianie oraz całą logikę relacyjną dopasowań i wiadomości.
-- Framework webowy: Flask (wraz z rozszerzeniami flask_login oraz flask_uploads)
-- Frontend: HTML, CSS, JavaScript, Bootstrap, Jinja2 oraz Alpine.js (użyty do sprawnej, dynamicznej manipulacji warstwą HTML w mniejszych komponentach)
-- Baza danych i ORM: SQLAlchemy, PostgreSQL z rozszerzeniem przestrzennym PostGIS
-- Bezpieczeństwo: Bcrypt do hashowania haseł użytkowników
+### 1. Main Application (Flask)
+Handles the user interface, sessions, authentication, and the entire relational logic for matches and messages.
+- Web framework: Flask (along with flask_login and flask_uploads extensions)
+- Frontend: HTML, CSS, JavaScript, Bootstrap, Jinja2, and Alpine.js (used for efficient, dynamic HTML manipulation in smaller components)
+- Database and ORM: SQLAlchemy, PostgreSQL with the PostGIS spatial extension
+- Security: Bcrypt for hashing user passwords
 
-### 2. Moduł Botinder API (FastAPI)
-Wewnętrzna, bezstanowa usługa pomocnicza, która została scalona z głównym projektem i ukryta w prywatnej strukturze. Odpowiada za operacje matematyczno-geograficzne.
+### 2. Botinder API Module (FastAPI)
+An internal, stateless helper service that has been merged with the main project and hidden within a private structure. It is responsible for mathematical and geographical operations.
 - Framework: FastAPI
-- Główne funkcjonalności: Geokodowanie (konwersja nazw miast na współrzędne geograficzne szerokości i długości) oraz precyzyjne obliczanie dystansu między użytkownikiem a robotem.
-- Bezpieczeństwo: Biblioteka Jose (obsługa tokenów JWT) oraz Bcrypt.
+- Main features: Geocoding (converting city names to geographical latitude and longitude coordinates) and precise calculation of the distance between a user and a robot.
+- Security: Jose library (handling JWT tokens) and Bcrypt.
 
 ---
 
-## Instrukcja uruchomienia (Docker Compose)
+## How to Run (Docker Compose)
 
-Dzięki pełnej konteneryzacji uruchomienie całego środowiska wraz z bazą danych i usługami towarzyszącymi sprowadza się do wykonania podstawowych poleceń. Nie jest wymagana lokalna instalacja bibliotek z pliku requirements.txt ani ręczna konfiguracja bazy danych.
+Thanks to full containerization, launching the entire environment along with the database and accompanying services comes down to executing basic commands. There is no need for local installation of libraries from the requirements.txt file or manual database configuration.
 
-### Wymagania wstępne
-- Zainstalowane i uruchomione oprogramowanie Docker oraz Docker Desktop.
+### Prerequisites
+- Installed and running Docker and Docker Desktop.
 
-### Proces uruchomienia
+### Startup Process
 
-**1. Czyszczenie i inicjalizacja bazy danych (Zalecane przy pierwszym starcie)**
-Aby usunąć stare wolumeny baz danych z poprzednich uruchomień i pozwolić, aby PostgreSQL oraz PostGIS postawiły się na nowo z automatycznym zasileniem danymi testowymi, wykonaj w terminalu:
+**1. Database cleanup and initialization (Recommended on first launch)**
+To remove old database volumes from previous runs and allow PostgreSQL and PostGIS to spin up fresh with automatic test data seeding, run the following in your terminal:
 
 ```bash
 docker-compose down -v
 ```
 
-**2. Budowanie i uruchomienie kontenerów**
-Aby wymusić czyste zbudowanie obrazów aplikacji i uruchomić usługi w tle, użyj komendy:
+**2. Building and starting containers**
+To force a clean build of the application images and start the services in the background, use the command:
 
 ```bash
 docker-compose up --build
 ```
 
-**3. Tryb automatycznego odświeżania kodu (Live-Reload)**
-W konfiguracji pliku docker-compose.yml zastosowano mapowanie wolumenów w formacie .:/app. Oznacza to, że każda modyfikacja wprowadzona w plikach źródłowych Pythona (.py) lub szablonach widoku (.html) na komputerze lokalnym jest natychmiast przenoszona do działającego kontenera. Nie ma potrzeby ponownego budowania obrazów podczas prac programistycznych.
+**3. Automatic code reload mode (Live-Reload)**
+The docker-compose.yml configuration uses volume mapping in the `.:/app` format. This means that any modification made to Python source files (.py) or view templates (.html) on your local machine is immediately reflected in the running container. There is no need to rebuild images during development.
 
 ---
 
-## Dane logowania i środowisko testowe
+## Login Credentials and Test Environment
 
-Po poprawnym uruchomieniu kontenerów i odczekaniu około 15-20 sekund na inicjalizację tabel oraz automatyczne zasianie danych (seeding), aplikacja główna staje się dostępna pod adresem:
+After successfully starting the containers and waiting about 15-20 seconds for table initialization and automatic data seeding, the main application becomes available at:
 http://localhost:5000
 
-W bazie danych automatycznie generowanych jest 100 profili robotów oraz dwa gotowe konta użytkowników do celów demonstracyjnych:
+The database automatically generates 100 robot profiles and two ready-made user accounts for demonstration purposes:
 
-### Profil Warszawa (Jan Kowalski)
-- Login: user_warszawa (alternatywnie imię: Jan)
-- Hasło: password123
+### Warsaw Profile (Jan Kowalski)
+- Login: user_warszawa (alternatively first name: Jan)
+- Password: password123
 
-### Profil Kraków (Anna Nowak)
-- Login: user_krakow (alternatywnie imię: Anna)
-- Hasło: password123
+### Krakow Profile (Anna Nowak)
+- Login: user_krakow (alternatively first name: Anna)
+- Password: password123
 
-Oba konta testowe posiadają już przypisaną i wygenerowaną listę 250 dopasowanych kandydatów-robotów, którzy znajdują się w promieniu do 10 kilometrów od wskazanego miasta. Wszystkie interakcje, mechanizmy czatu oraz dopasowania działają natychmiastowo.
+Both test accounts already have an assigned and generated list of 250 matched robot candidates located within a 10-kilometer radius of the selected city. All interactions, chat mechanisms, and matching work instantly.
