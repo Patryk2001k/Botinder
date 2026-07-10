@@ -1,8 +1,7 @@
-import json
-import random
-import logging  # IMPORT LOGGING
-from random import uniform
+from json import load  # JAWNY IMPORT zamiast import json
+from random import uniform, randint  # JAWNY IMPORT zamiast import random
 from pathlib import Path
+from logging import getLogger
 
 from faker import Faker
 from geopy.distance import great_circle
@@ -10,14 +9,14 @@ from geoalchemy2.elements import WKTElement
 
 from app.models.robots import UserRobot, RobotProfile
 
-logger = logging.getLogger(__name__)  # LOGGER INSTANCE
+logger = getLogger(__name__)
 
 CURRENT_DIR = Path(__file__).resolve().parent.parent
 DESCRIPTIONS_PATH = CURRENT_DIR / "data" / "descriptions.json"
 
 try:
     with open(DESCRIPTIONS_PATH, "r", encoding="utf-8") as robots_descriptions:
-        r_descriptions = json.load(robots_descriptions)
+        r_descriptions = load(robots_descriptions)
 except Exception as e:
     logger.error(f"Failed to load descriptions.json from {DESCRIPTIONS_PATH}: {e}", exc_info=True)  # POPRAWKA
     r_descriptions = ["I am an advanced support android robot."]  # POPRAWKA: po angielsku
@@ -25,7 +24,7 @@ except Exception as e:
 
 def generate_random_location_within_radius(user_location, radius_km=50):
     angle = uniform(0, 360)
-    new_location = great_circle(kilometers=random.randint(0, radius_km)).destination(
+    new_location = great_circle(kilometers=randint(0, radius_km)).destination(
         user_location, angle
     )
     return new_location.latitude, new_location.longitude
@@ -42,8 +41,8 @@ def generate_random_robots(
                 user_location, user.user_criteria.distance
             )
         else:
-            latitude = random.uniform(-90, 90)
-            longitude = random.uniform(-180, 180)
+            latitude = uniform(-90, 90)
+            longitude = uniform(-180, 180)
 
         robot_location = WKTElement(f"POINT({longitude} {latitude})", srid=4326)
         name = fake.first_name()
@@ -53,11 +52,11 @@ def generate_random_robots(
             "humanoid": ["T-1000_f.jpg", "T-1000_f_2.jpg", "T-1000_f_3.jpg"],
             "non-humanoid": ["Vacum_1.jpg", "Vacum_2.jpg"],
         }
-        choosed_type_of_robot = type_of_robot[random.randint(0, 1)]
+        choosed_type_of_robot = type_of_robot[randint(0, 1)]
 
         robot = UserRobot(
             name=name,
-            image_file=f"{choosed_type_of_robot}/{robots_images[choosed_type_of_robot][random.randint(0, len(robots_images[choosed_type_of_robot]) - 1)]}",
+            image_file=f"{choosed_type_of_robot}/{robots_images[choosed_type_of_robot][randint(0, len(robots_images[choosed_type_of_robot]) - 1)]}",
             location=robot_location,
             domicile_geolocation=robot_location,
         )
@@ -72,10 +71,10 @@ def generate_random_robots(
         robot_profile = RobotProfile(
             type_of_robot=choosed_type_of_robot,
             name=name,
-            profile_description=f"{r_descriptions[random.randint(0, len(r_descriptions) - 1)]}",
+            profile_description=f"{r_descriptions[randint(0, len(r_descriptions) - 1)]}",
             domicile=f"My-domicile{i}",
-            procesor_unit=f"{procesor_unit[random.randint(0, 3)]}, {procesor_value[random.randint(0, 9)]}000",
-            employment_status=employment_status[random.randint(0, 1)],
+            procesor_unit=f"{procesor_unit[randint(0, 3)]}, {procesor_value[randint(0, 9)]}000",
+            employment_status=employment_status[randint(0, 1)],
             user_id=robot.id,
         )
 

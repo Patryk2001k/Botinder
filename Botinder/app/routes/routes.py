@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, redirect, render_template, request, url_for, current_app
 from flask_login import current_user, login_required
+from dataclasses import asdict  # IMPORT ASDICT dla serializacji DTO
 
-# Wszystkie importy przeniesione na samą górę pliku
 from app.services.matchmaking import MatchmakingService
 from app.services.chat import ChatService
 from app.services.database_operations import (
@@ -9,7 +9,6 @@ from app.services.database_operations import (
 )
 
 main_bp = Blueprint('main', __name__)
-
 
 @main_bp.route("/")
 @main_bp.route("/home")
@@ -68,7 +67,8 @@ def match():
     )
     
     if match_result:
-        return jsonify({"message": "Success", "match_result": match_result}), 200
+        # POPRAWKA: asdict() automatycznie i czysto konwertuje MatchResultDTO do słownika JSON
+        return jsonify({"message": "Success", "match_result": asdict(match_result)}), 200
     return jsonify({"message": "No match"}), 200
 
 
@@ -81,9 +81,10 @@ def chatroom(chatroom_id):
         "user_homepage/chatroom.html",
         chatroom_id=chatroom_id,
         user=current_user.username,
-        matched_robots=chat_context["matched_robots"],
-        robot_info=chat_context["robot_info"],
-        messages=chat_context["messages"],
+        # POPRAWKA: Odczytujemy bezpiecznie bezpośrednio z atrybutów obiektu DTO
+        matched_robots=chat_context.matched_robots,
+        robot_info=chat_context.robot_info,
+        messages=chat_context.messages,
     )
 
 

@@ -8,6 +8,7 @@ from app.models.matches import UnMatches, UserMatches, RobotMatches
 from app.services.robot_selector import get_robots_for_user
 from app.services.generate_robots import generate_random_robots
 from app.services.helpers import robot_to_dict
+from app.services.dtos import MatchResultDTO  # IMPORT DTO
 
 class MatchmakingService:
     @classmethod
@@ -15,7 +16,6 @@ class MatchmakingService:
         with session_scope() as session:
             robots_list = get_robots_for_user(user, session)
             if not robots_list:
-                # Płaskie wywołanie generatora
                 generate_random_robots(
                     start=0, number_of_robots=5000, user_location=None, user=user, session=session
                 )
@@ -42,7 +42,8 @@ class MatchmakingService:
             )
 
     @classmethod
-    def match_robot(cls, user, robot_id: int, robot_name: str) -> dict | None:
+    def match_robot(cls, user, robot_id: int, robot_name: str) -> MatchResultDTO | None:
+        """Obsługuje polubienie i zwraca MatchResultDTO w przypadku dopasowania."""
         with session_scope() as session:
             add_match_unmatch(
                 session,
@@ -69,9 +70,10 @@ class MatchmakingService:
                 )
                 robot_info = get_robot_info_by_chatroom_id(session, match_result[1])
                 
-                return {
-                    "robot_image": robot_info.image_file,
-                    "chatroom_id": match_result[1],
-                    "robot_name": robot_info.name,
-                }
+                # Zwracamy obiekt DTO zamiast słownika
+                return MatchResultDTO(
+                    robot_image=robot_info.image_file,
+                    chatroom_id=match_result[1],
+                    robot_name=robot_info.name
+                )
             return None

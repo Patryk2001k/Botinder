@@ -1,31 +1,38 @@
-import json
-import logging  # IMPORT LOGGING
+from json import load  # JAWNY IMPORT zamiast import json
+from logging import getLogger  # JAWNY IMPORT zamiast import logging
 import country_converter as coco
 from geopy.distance import geodesic
 from ip2geotools.databases.noncommercial import DbIpCity
 from flask import has_request_context, request, current_app
 from pathlib import Path
 
+from app.services.dtos import LocationInfoDTO  # IMPORT DTO
 from app.services.API_requests.requests import (
     get_botinderAPI_coordinates,
     get_botinderAPI_distance
 )
 
-logger = logging.getLogger(__name__)  # LOGGER INSTANCE
+logger = getLogger(__name__)
 
 class GeolocalizationService:
     _cities_cache = None
 
     @classmethod
     def _load_cities(cls) -> dict:
+        """Ładuje bazę miast z folderu app/data/ w sposób leniwy."""
         if cls._cities_cache is None:
             current_dir = Path(__file__).resolve().parent.parent
             cities_path = current_dir / "data" / "cities.json"
+            
+            if not cities_path.exists():
+                cities_path = current_dir / "data" / "cities.JSON"
+                
             try:
                 with open(cities_path, "r", encoding="utf-8") as f:
-                    cls._cities_cache = json.load(f)
+                    cls._cities_cache = load(f)  # JAWNE UŻYCIE load()
+                logger.info(f"Successfully loaded cities database from: {cities_path}")
             except Exception as e:
-                logger.error(f"Failed to load cities.json from path {cities_path}: {e}", exc_info=True)  # POPRAWKA
+                logger.error(f"Failed to load cities file from path {cities_path}: {e}", exc_info=True)
                 cls._cities_cache = {}
         return cls._cities_cache
 
@@ -37,7 +44,8 @@ class GeolocalizationService:
         return ip
 
     @classmethod
-    def get_location_info(cls) -> dict:
+    def get_location_info(cls) -> LocationInfoDTO:
+        """Pobiera informacje o lokalizacji na podstawie adresu IP i zwraca je jako LocationInfoDTO."""
         ip_address = cls.get_ip()
         
         if (not ip_address or 
@@ -49,26 +57,27 @@ class GeolocalizationService:
             
         try:
             response = DbIpCity.get(ip_address, api_key="free")
-            return {
-                "ip": ip_address,
-                "city": response.city,
-                "region": response.region,
-                "country": response.country,
-            }
+            # Zwracamy obiekt DTO zamiast słownika
+            return LocationInfoDTO(
+                ip=ip_address,
+                city=response.city,
+                region=response.region,
+                country=response.country
+            )
         except Exception as e:
-            logger.warning(f"DbIpCity lookup failed for IP {ip_address} (falling back to Warsaw, PL): {e}")  # POPRAWKA
-            return {
-                "ip": ip_address,
-                "city": "Warszawa",
-                "region": "Mazovia",
-                "country": "PL",
-            }
+            logger.warning(f"DbIpCity lookup failed for IP {ip_address} (falling back to Warsaw, PL): {e}")
+            return LocationInfoDTO(
+                ip=ip_address,
+                city="Warszawa",
+                region="Mazovia",
+                country="PL"
+            )
 
     @classmethod
     def get_cities(cls) -> list[str]:
         try:
             location = cls.get_location_info()
-            country_code = location.get("country")
+            country_code = location.country  # Dostęp do atrybutu obiektu DTO
             
             cities_db = cls._load_cities()
             if not country_code or country_code not in cities_db:
@@ -77,7 +86,7 @@ class GeolocalizationService:
             cities_with_country_code = cities_db.get(country_code, [])
             return [city["name"] for city in cities_with_country_code]
         except Exception as e:
-            logger.error(f"Failed to generate cities list (falling back to defaults): {e}")  # POPRAWKA
+            logger.error(f"Failed to generate cities list (falling back to defaults): {e}")
             return ["Warszawa", "Kraków", "Wrocław", "Poznań", "Gdańsk", "Łódź"]
 
     @classmethod
@@ -86,7 +95,7 @@ class GeolocalizationService:
             response = get_botinderAPI_coordinates(city_name)
             return [response["latitude"], response["longitude"]]
         except Exception as e:
-            logger.warning(f"Failed to fetch coordinates for {city_name} from API (falling back to Warsaw): {e}")  # POPRAWKA
+            logger.warning(f"Failed to fetch coordinates for {city_name} from API (falling back to Warsaw): {e}")
             return [52.2297, 21.0122]
 
     @classmethod
@@ -101,7 +110,7 @@ class GeolocalizationService:
             response = get_botinderAPI_distance(params)
             return response.get("distance")
         except Exception as e:
-            logger.warning(f"Failed to fetch distance from API (falling back to local geodesic calculation): {e}")  # POPRAWKA
+            logger.warning(f"Failed to fetch distance from API (falling back to local geodesic calculation): {e}")
             first_cords = (first_lat, first_lon)
             second_cords = (second_lat, second_lon)
             return int(geodesic(first_cords, second_cords).km)
@@ -110,6 +119,6 @@ class GeolocalizationService:
     def country_name_to_code(cls) -> str:
         try:
             country_name = cls.get_location_info()
-            return coco.convert(names=country_name["country"], to="ISO2")
+            return coco.convert(names=country_name.country, to="ISO2")  # Atrybut obiektu DTO
         except Exception:
             return "PL"

@@ -1,12 +1,12 @@
 import os
-import time
-import logging  # IMPORT LOGGING
+from time import time  # JAWNY IMPORT
+from logging import getLogger  # JAWNY IMPORT
 from threading import Lock
 import requests
 from flask import current_app
 
-logger = logging.getLogger(__name__)  # LOGGER INSTANCE
-
+logger = getLogger(__name__)
+# ... (reszta kodu bez zmian) ...
 class BotinderApiClient:
     _instance = None
     _lock = Lock()

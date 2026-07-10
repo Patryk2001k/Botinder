@@ -5,26 +5,28 @@ from app.services.database_operations import (
 )
 from app.models.matches import UnMatches
 from app.services.tasks import calL_GPT_API
+from app.services.dtos import ChatroomContextDTO  # IMPORT DTO
 
 class ChatService:
     @classmethod
-    def get_chatroom_context(cls, user, chatroom_id: int) -> dict:
-        """Pobiera kompletny zestaw danych wymagany do wyrenderowania pokoju czatu."""
+    def get_chatroom_context(cls, user, chatroom_id: int) -> ChatroomContextDTO:
+        """Pobiera i pakuje kontekst czatu do obiektu ChatroomContextDTO."""
         with session_scope() as session:
             matched_robots = get_matched_robots(
                 session, user.id, user.name, include_chatroom_id=True
             )
             robot_info = get_robot_info_by_chatroom_id(session, chatroom_id)
             chat_messages = get_chatroom_messages(session, chatroom_id)
-            return {
-                "matched_robots": matched_robots,
-                "robot_info": robot_info,
-                "messages": chat_messages,
-            }
+            
+            # Zwracamy obiekt DTO zamiast słownika
+            return ChatroomContextDTO(
+                matched_robots=matched_robots,
+                robot_info=robot_info,
+                messages=chat_messages
+            )
 
     @classmethod
     def unmatch_chatroom(cls, user, chatroom_id: int, robot_id: int, robot_name: str, user_name: str) -> None:
-        """Trwale usuwa pokój rozmów, dotychczasowe dopasowania i zapisuje zdarzenie odrzucenia."""
         with session_scope() as session:
             add_match_unmatch(
                 session,
@@ -39,8 +41,6 @@ class ChatService:
 
     @classmethod
     def process_user_message(cls, chatroom_id: int, message_text: str) -> str:
-        """Zapisuje wiadomość od użytkownika, odpytuje GPT API i zapisuje odpowiedź robota."""
-        # Pobieranie odpowiedzi z silnika AI
         gpt_response = calL_GPT_API()
 
         with session_scope() as session:

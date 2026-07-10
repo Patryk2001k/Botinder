@@ -1,14 +1,14 @@
-import os
-import logging  # IMPORT LOGGING
+from os import environ  # JAWNY IMPORT
+from logging import getLogger  # JAWNY IMPORT
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker, scoped_session
 from sqlalchemy_utils import create_database, database_exists
 
-logger = logging.getLogger(__name__)  # LOGGER INSTANCE
+logger = getLogger(__name__)
 
 Base = declarative_base()
 
-DB_URL = os.environ.get(
+DB_URL = environ.get(
     "DATABASE_URL", 
     "postgresql://botinder_user:botinder_secure_password@db:5432/botinder_web"
 )
