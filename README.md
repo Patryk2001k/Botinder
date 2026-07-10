@@ -19,18 +19,12 @@ The project was created as a humorous simulation of a dating app for humans and 
 - of course i use basic stuff like HTML, CSS, JS and jinja2, <a href="https://getbootstrap.com/" alt="Boostrap">Boostrap</a> 
 - <a href="https://alpinejs.dev/" alt="alpine.js">alpine.js</a> (i used this js framework to simple stuff with html, in shortcut this framework can do dynamic html in simple way and i think it is good for small projects)
   
-### 1. Main Application (Flask)
+### Main Application (Flask)
 Handles the user interface, sessions, authentication, and the entire relational logic for matches and messages.
 - Web framework: Flask (along with flask_login and flask_uploads extensions)
 - Frontend: HTML, CSS, JavaScript, Bootstrap, Jinja2, and Alpine.js (used for efficient, dynamic HTML manipulation in smaller components)
 - Database and ORM: SQLAlchemy, PostgreSQL with the PostGIS spatial extension
 - Security: Bcrypt for hashing user passwords
-
-### 2. Botinder API Module (FastAPI)
-An internal, stateless helper service that has been merged with the main project and hidden within a private structure. It is responsible for mathematical and geographical operations.
-- Framework: FastAPI
-- Main features: Geocoding (converting city names to geographical latitude and longitude coordinates) and precise calculation of the distance between a user and a robot.
-- Security: Jose library (handling JWT tokens) and Bcrypt.
 
 ---
 
@@ -56,10 +50,6 @@ To force a clean build of the application images and start the services in the b
 ```bash
 docker-compose up --build
 ```
-
-**3. Automatic code reload mode (Live-Reload)**
-The docker-compose.yml configuration uses volume mapping in the `.:/app` format. This means that any modification made to Python source files (.py) or view templates (.html) on your local machine is immediately reflected in the running container. There is no need to rebuild images during development.
-
 ---
 
 ## Login Credentials and Test Environment
