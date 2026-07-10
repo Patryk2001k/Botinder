@@ -1,20 +1,33 @@
-from flask import Blueprint, jsonify, redirect, render_template, request, url_for, current_app, flash
+from flask import (
+    Blueprint,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    url_for,
+    current_app,
+    flash,
+)
 from flask_login import current_user, login_required
-from dataclasses import asdict  # IMPORT ASDICT dla serializacji DTO
+from dataclasses import asdict
 
 from app.services.matchmaking import MatchmakingService
 from app.services.chat import ChatService
 from app.services.database_operations import (
-    get_user, session_scope, update_user_location, update_user_location_domicile
+    get_user,
+    session_scope,
+    update_user_location,
+    update_user_location_domicile,
 )
 
-main_bp = Blueprint('main', __name__)
+main_bp = Blueprint("main", __name__)
+
 
 @main_bp.route("/")
 @main_bp.route("/home")
 def home():
-    current_app.config['STATIC_USER_IP'] = request.remote_addr
-    
+    current_app.config["STATIC_USER_IP"] = request.remote_addr
+
     if current_user.is_authenticated:
         return redirect(url_for("main.user_homepage"))
     return render_template("main/start-page.html")
@@ -35,7 +48,7 @@ def FAQ():
 def user_homepage():
     robots_list = MatchmakingService.get_candidate_robots(current_user)
     matched_robots = MatchmakingService.get_matches(current_user)
-    
+
     return render_template(
         "user_homepage/user_homepage.html",
         user=current_user.username,
@@ -49,9 +62,7 @@ def user_homepage():
 def unmatch():
     data = request.get_json()
     MatchmakingService.unmatch_robot(
-        user=current_user, 
-        robot_id=data["id"], 
-        robot_name=data["name"]
+        user=current_user, robot_id=data["id"], robot_name=data["name"]
     )
     return jsonify({"message": "Successfully unmatched"}), 200
 
@@ -61,13 +72,14 @@ def unmatch():
 def match():
     data = request.get_json()
     match_result = MatchmakingService.match_robot(
-        user=current_user,
-        robot_id=data["id"],
-        robot_name=data["name"]
+        user=current_user, robot_id=data["id"], robot_name=data["name"]
     )
-    
+
     if match_result:
-        return jsonify({"message": "Success", "match_result": asdict(match_result)}), 200
+        return (
+            jsonify({"message": "Success", "match_result": asdict(match_result)}),
+            200,
+        )
     return jsonify({"message": "No match"}), 400
 
 
@@ -75,17 +87,15 @@ def match():
 @login_required
 def chatroom(chatroom_id):
     chat_context = ChatService.get_chatroom_context(current_user, int(chatroom_id))
-    
+
     if not chat_context.robot_info:
         flash("This chatroom no longer exists or has been deleted.")
         return redirect(url_for("main.user_homepage"))
-    
 
     return render_template(
         "user_homepage/chatroom.html",
         chatroom_id=chatroom_id,
         user=current_user.username,
-        # POPRAWKA: Odczytujemy bezpiecznie bezpośrednio z atrybutów obiektu DTO
         matched_robots=chat_context.matched_robots,
         robot_info=chat_context.robot_info,
         messages=chat_context.messages,
@@ -101,7 +111,7 @@ def chatroom_unmatch():
         chatroom_id=int(data.get("chatroomId")),
         robot_id=int(data.get("robotId")),
         robot_name=data.get("robotName"),
-        user_name=data.get("userName")
+        user_name=data.get("userName"),
     )
     return jsonify({"status": "success"})
 
@@ -112,7 +122,7 @@ def send_message():
         client_data = request.json
         gpt_response = ChatService.process_user_message(
             chatroom_id=int(client_data["chatroom_id"]),
-            message_text=client_data["message"]
+            message_text=client_data["message"],
         )
         return jsonify({"message": gpt_response})
     except Exception as e:
@@ -132,7 +142,7 @@ def get_geolocation():
     data = request.get_json()
     latitude = data.get("latitude")
     longitude = data.get("longitude")
-    
+
     with session_scope() as session:
         if latitude is not None and longitude is not None:
             update_user_location(session, longitude, latitude, current_user)

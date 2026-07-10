@@ -1,0 +1,28 @@
+body{
+    font-family: 'Quicksand';
+}
+
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.admin-top-menu{
+    display: inline-block;
+    width: 150%;
+    height: 50px;
+    margin-bottom: 10px;
+    background-color: rgb(53, 169, 207);
+    font-size: xx-large;
+    text-align: center;
+}
+
+.logout-paragraph:hover{
+    cursor: pointer;
+}
+
+
+
+

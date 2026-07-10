@@ -50,13 +50,12 @@ class TestUtils(unittest.TestCase):
 
         result = robot_to_dict(table)
 
-        self.assertEqual(len(result), 2)  # Sprawdzenie liczby robotów
+        self.assertEqual(len(result), 2)
         self.assertEqual(result[0]["id"], 1)
         self.assertEqual(result[0]["name"], "Robot1")
         self.assertEqual(result[0]["distance_to_user"], 10)
 
 
-# Simulation of the robot object
 class MockRobot:
     def __init__(
         self,

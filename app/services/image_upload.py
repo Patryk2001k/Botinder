@@ -3,14 +3,13 @@ import secrets
 
 from flask_login import current_user
 from flask_uploads import IMAGES, UploadSet
-from flask import current_app # POPRAWKA: current_app zamiast globalnego app
+from flask import current_app
 
-# Tworzymy zestaw zdjęć (nie konfigurujemy go jeszcze z instancją aplikacji)
 photos = UploadSet("photos", IMAGES)
 
 
 def get_image(photo, name, url_path="users"):
-    # POPRAWKA: Używamy current_app.config zamiast app.config
+
     current_app.config["UPLOADED_PHOTOS_DEST"] = f"app/static/images/{url_path}/{name}"
     os.makedirs(f"app/static/images/{url_path}/{name}", exist_ok=True)
 

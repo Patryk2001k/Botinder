@@ -1,4 +1,4 @@
-/* Styl głównego kontenera */
+
 .user-message {
     display: flex;
     flex-direction: row;
@@ -6,16 +6,16 @@
     height: 100vh;
   }
   
-  /* Styl dla lewej części kontenera */
+  
   .left-main-div {
-    flex: 2;  /* 2/3 dostępnej przestrzeni */
+    flex: 2;  
     display: flex;
     flex-direction: column;
   }
   
-  /* Styl dla prawej części kontenera */
+  
   .right-main-div {
-    flex: 1;  /* 1/3 dostępnej przestrzeni */
+    flex: 1;  
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -66,7 +66,7 @@
     cursor: pointer;
   }
   
-  /* Styl dla głównego diva chatu */
+  
   .chat-history {
     width: 100%;
     height: 775px;
@@ -77,29 +77,29 @@
     -ms-overflow-style: none;
   }
   
-  /* Dla przeglądarek opartych na WebKit (Safari, Chrome, itd.) */
+  
   .chat-history::-webkit-scrollbar {
     display: none;
   }
   
-  /* Styl dla poszczególnych wiadomości użytkownika i robota */
+  
   .user-message-chat,
   .robot-message-chat {
     padding: 10px;
     margin: 15px;
     max-width: 45%;
     border-radius: 15px;
-    display: inline-block;  /* Dostosowanie do wielkości tekstu */
+    display: inline-block;  
   }
   
   .user-message-chat {
     background-color: #3c7cc9;
-    align-self: flex-end; /* Wyrównanie do prawej strony */
+    align-self: flex-end; 
   }
   
   .robot-message-chat {
     background-color: grey;
-    align-self: flex-start; /* Wyrównanie do lewej strony */
+    align-self: flex-start; 
   }
   
   .user-message-sender{

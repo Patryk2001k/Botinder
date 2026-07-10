@@ -1,41 +1,71 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField, FileRequired
-from wtforms import (EmailField, IntegerField, PasswordField, SelectField,
-                     StringField, SubmitField, TextAreaField)
+from wtforms import (
+    EmailField,
+    IntegerField,
+    PasswordField,
+    SelectField,
+    StringField,
+    SubmitField,
+    TextAreaField,
+)
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
 
 from app.forms.utils import enum_to_choices
-from app.models.enums import EmploymentStatusCriteria, EmploymentStatusProfile, Gender, RobotType
+from app.models.enums import (
+    EmploymentStatusCriteria,
+    EmploymentStatusProfile,
+    Gender,
+    RobotType,
+)
 from app.database import db_session
 from app.models.user import User
 
+
 class RegistrationForm(FlaskForm):
-    username = StringField("username", validators=[DataRequired(), Length(min=2, max=20)])
+    username = StringField(
+        "username", validators=[DataRequired(), Length(min=2, max=20)]
+    )
     email = EmailField("email", validators=[DataRequired(), Email()])
     password = PasswordField("password", validators=[DataRequired()])
-    confirm_password = PasswordField("confirm password", validators=[DataRequired(), EqualTo("password")])
-    
-    type_of_robot = SelectField("type of robot", validators=[DataRequired()], choices=enum_to_choices(RobotType, replace=True))
-    distance = IntegerField("distance", validators=[DataRequired()])
-    
-    employment_status_criteria = SelectField(
-        "employment status criteria", 
-        validators=[DataRequired()], 
-        choices=enum_to_choices(EmploymentStatusCriteria, replace=True)
+    confirm_password = PasswordField(
+        "confirm password", validators=[DataRequired(), EqualTo("password")]
     )
-    
+
+    type_of_robot = SelectField(
+        "type of robot",
+        validators=[DataRequired()],
+        choices=enum_to_choices(RobotType, replace=True),
+    )
+    distance = IntegerField("distance", validators=[DataRequired()])
+
+    employment_status_criteria = SelectField(
+        "employment status criteria",
+        validators=[DataRequired()],
+        choices=enum_to_choices(EmploymentStatusCriteria, replace=True),
+    )
+
     age = IntegerField("age", validators=[DataRequired()])
     name = StringField("name", validators=[DataRequired()])
     lastname = StringField("lastname", validators=[DataRequired()])
-    gender = SelectField("gender", validators=[DataRequired()], choices=enum_to_choices(Gender, replace=True))
-    profile_description = TextAreaField("profile description", validators=[DataRequired()])
-    
-    # OPCJA A: Zmiana SelectField na StringField (pole tekstowe)
+    gender = SelectField(
+        "gender",
+        validators=[DataRequired()],
+        choices=enum_to_choices(Gender, replace=True),
+    )
+    profile_description = TextAreaField(
+        "profile description", validators=[DataRequired()]
+    )
+
     domicile = StringField("domicile", validators=[DataRequired()])
-    
+
     education = StringField("education", validators=[DataRequired()])
-    employment_status_profile = SelectField("employment status profile", validators=[DataRequired()], choices=enum_to_choices(EmploymentStatusProfile, replace=True))
-    
+    employment_status_profile = SelectField(
+        "employment status profile",
+        validators=[DataRequired()],
+        choices=enum_to_choices(EmploymentStatusProfile, replace=True),
+    )
+
     photo = FileField(
         validators=[
             FileAllowed(["jpg", "jpeg", "png"], "only images allowed"),
@@ -48,7 +78,7 @@ class RegistrationForm(FlaskForm):
         user = db_session.query(User).filter_by(username=username.data).first()
         if user:
             raise ValidationError("This username is already taken.")
-        
+
         if username.data == self.name.data:
             raise ValidationError("Username and display name must be different.")
 
@@ -64,26 +94,28 @@ class RegistrationForm(FlaskForm):
 
     def validate_password(self, password):
         from app.extensions import bcrypt
+
         users = db_session.query(User).all()
         for user in users:
             if bcrypt.check_password_hash(user.password, password.data):
-                raise ValidationError("For security reasons, this password cannot be used as it is already registered by another user.")
+                raise ValidationError(
+                    "For security reasons, this password cannot be used as it is already registered by another user."
+                )
 
-    # ŚCIEŻKA 2 (Walidator poprawności wpisanego miasta w geopy):
     def validate_domicile(self, domicile):
-        """Sprawdza przed rejestracją, czy wpisane miasto fizycznie istnieje na mapie."""
         from geopy.geocoders import Nominatim
-        
+
         geolocator = Nominatim(user_agent="Botinder_App_Validation_Client_2026")
         try:
             location = geolocator.geocode(domicile.data, timeout=5)
             if not location:
-                raise ValidationError("We couldn't find this city. Please enter a valid, existing city name.")
+                raise ValidationError(
+                    "We couldn't find this city. Please enter a valid, existing city name."
+                )
         except ValidationError:
             raise
         except Exception:
-            # Zabezpieczenie awaryjne (Fail-safe): 
-            # W przypadku awarii zewnętrznego serwera Nominatima, przepuszczamy formularz dalej.
+
             pass
 
 

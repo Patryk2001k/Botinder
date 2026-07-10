@@ -31,15 +31,15 @@ function displayRobot(index) {
 function addMatch(matched_robot) {
     const container = document.querySelector('.main-match-users-menu');
 
-    // Tworzenie nowego elementu div
+    
     const newDiv = document.createElement('div');
     newDiv.className = 'first-matched-user';
   
-    // Tworzenie nowego elementu a (linku)
+    
     const newLink = document.createElement('a');
     newLink.href = `/chatroom/${matched_robot.chatroom_id}`;
   
-    // Tworzenie nowego elementu img (obrazu)
+    
     const newImg = document.createElement('img');
     console.log(matched_robot.robot_image);
     const staticUrl = document.querySelector('.main-match-users-menu').getAttribute('data-static-url');
@@ -47,11 +47,11 @@ function addMatch(matched_robot) {
     newImg.src = `${staticUrl}${matched_robot.robot_image}`;
     console.log(newImg.src)
 
-    // Tworzenie nowego elementu p (paragrafu)
+    
     const newParagraph = document.createElement('p');
     newParagraph.textContent = matched_robot.robot_name;
   
-    // Dodawanie elementów do struktury DOM
+    
     newLink.appendChild(newImg);
     newLink.appendChild(newParagraph);
     newDiv.appendChild(newLink);
@@ -137,23 +137,23 @@ async function nextUserUnmatch() {
 
 function nextUserUnmatch2() {
     const newUserWindow = document.querySelector('.new-user-window');
-    newUserWindow.classList.add('move-left');  // Dodaje klasę, która przesuwa okno w lewo
+    newUserWindow.classList.add('move-left');  
   
-    // Reset klasy po animacji
+    
     setTimeout(() => {
       newUserWindow.classList.remove('move-left');
-      // Tu możesz załadować kolejnego użytkownika
+      
     }, 300);
   }
 
   function nextUserMatch2() {
     const newUserWindow = document.querySelector('.new-user-window');
-    newUserWindow.classList.add('move-right');  // Dodaje klasę, która przesuwa okno w prawo
+    newUserWindow.classList.add('move-right');  
   
-    // Reset klasy po animacji
+    
     setTimeout(() => {
       newUserWindow.classList.remove('move-right');
-      // Tu możesz załadować kolejnego użytkownika
+      
     }, 300);
   }
 

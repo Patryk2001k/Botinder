@@ -83,7 +83,7 @@ body{
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
-    align-content: flex-start;  /* POPRAWKA: Rzędy będą układać się ciasno od góry */
+    align-content: flex-start;  
     width: 100%;
     height: 90%;
     overflow-y: auto;
@@ -97,8 +97,8 @@ body{
 }
 
 .first-matched-user{
-    flex: 0 0 auto;  /* Zamiast width: 25% */
-    min-width: calc(33.333% - 29px);  /* Odejmujemy marginesy, aby 3 elementy zmieściły się w jednym rzędzie */
+    flex: 0 0 auto;  
+    min-width: calc(33.333% - 29px);  
     margin-left: 14px;
     margin-right: 15px;
     height: 100px;
@@ -120,8 +120,8 @@ body{
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* To spowoduje, że obrazek wypełni cały div, nie wykraczając poza jego granice */
-    z-index: 0; /* To umieści obrazek w tle */
+    object-fit: cover; 
+    z-index: 0; 
 }
 
 .first-matched-user p{
@@ -134,8 +134,8 @@ body{
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 85%;
-    z-index: 1; /* To umieści tekst na wierzchu */
-    color: white; /* To uczyni tekst widocznym na tle obrazka */
+    z-index: 1; 
+    color: white; 
 }
 
 .user-messages{
@@ -208,10 +208,10 @@ body{
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.4);
-    z-index: 9999;  /* Nadpisuje inne elementy */
+    z-index: 9999;  
     display: flex;
     justify-content: center;
-    align-items: center;  /* Wyśrodkowanie */
+    align-items: center;  
 }
   
   .custom-alert-content, .demo-end-alert-content {

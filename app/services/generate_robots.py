@@ -1,5 +1,5 @@
-from json import load  # JAWNY IMPORT zamiast import json
-from random import uniform, randint  # JAWNY IMPORT zamiast import random
+from json import load
+from random import uniform, randint
 from pathlib import Path
 from logging import getLogger
 
@@ -18,8 +18,10 @@ try:
     with open(DESCRIPTIONS_PATH, "r", encoding="utf-8") as robots_descriptions:
         r_descriptions = load(robots_descriptions)
 except Exception as e:
-    logger.error(f"Failed to load descriptions.json from {DESCRIPTIONS_PATH}: {e}", exc_info=True)  # POPRAWKA
-    r_descriptions = ["I am an advanced support android robot."]  # POPRAWKA: po angielsku
+    logger.error(
+        f"Failed to load descriptions.json from {DESCRIPTIONS_PATH}: {e}", exc_info=True
+    )
+    r_descriptions = ["I am an advanced support android robot."]
 
 
 def generate_random_location_within_radius(user_location, radius_km=50):
@@ -33,7 +35,9 @@ def generate_random_location_within_radius(user_location, radius_km=50):
 def generate_random_robots(
     start=0, number_of_robots=20, user_location=None, user=None, session=None
 ):
-    logger.info(f"Generating {number_of_robots} random robots for matchmaking database...")  # POPRAWKA
+    logger.info(
+        f"Generating {number_of_robots} random robots for matchmaking database..."
+    )
     fake = Faker()
     for i in range(start, number_of_robots):
         if user_location is not None and user.user_criteria.distance is not None:
@@ -79,4 +83,4 @@ def generate_random_robots(
         )
 
         session.add(robot_profile)
-    logger.info("Successfully populated database with random robots.")  # POPRAWKA
+    logger.info("Successfully populated database with random robots.")

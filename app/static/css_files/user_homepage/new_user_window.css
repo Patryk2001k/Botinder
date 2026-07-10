@@ -144,9 +144,9 @@
 }
 
 .move-right {
-    transform: translate(500px, -200px) rotate(-90deg);  /* przesunięcie i obrót */
+    transform: translate(500px, -200px) rotate(-90deg);  
 }
 
 .move-left {
-    transform: translate(-500px, -200px) rotate(90deg);  /* przesunięcie i obrót w drugą stronę */
+    transform: translate(-500px, -200px) rotate(90deg);  
 }

@@ -12,7 +12,6 @@ class MatchBase(Base):
     robot_id = Column(Integer, ForeignKey("user_robot.id"), nullable=False)
     robot_name = Column(String(20), nullable=True)
     match_type = Column(String(50))
-    # timestamp = Column(DateTime, default=datetime.utcnow)
 
     __mapper_args__ = {"polymorphic_identity": "matches", "polymorphic_on": match_type}
 
@@ -48,8 +47,6 @@ class UnMatches(MatchBase):
     __mapper_args__ = {
         "polymorphic_identity": "unmatches",
     }
-    # user = relationship("User", backref="unmatches")
-    # robot = relationship("UserRobot", backref="unmatches")
 
     def __repr__(self):
         return f"UnMatch('{self.user_id}', '{self.robot_id}', '{self.user_name}', '{self.robot_name}')"

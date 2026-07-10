@@ -2,24 +2,24 @@ const textareas = document.querySelectorAll('.message-sender');
 
 
 textareas.forEach(textarea => {
-const initialHeight = "30px"; // Możesz tu ustawić początkową wysokość
+const initialHeight = "30px"; 
 
-textarea.style.height = initialHeight; // Ustawiamy początkową wysokość
+textarea.style.height = initialHeight; 
 
 textarea.addEventListener('input', function() {
-    this.style.height = initialHeight; // Resetujemy do początkowej wysokości
+    this.style.height = initialHeight; 
     const scrollHeight = this.scrollHeight;
     
     if (scrollHeight <= 150) {
-    this.style.height = scrollHeight + 'px'; // Powiększ w górę do 300px
+    this.style.height = scrollHeight + 'px'; 
     } else {
-    this.style.height = '150px'; // Zatrzymaj na 300px i włącz pasek przewijania
+    this.style.height = '150px'; 
     }
 });
 
 textarea.addEventListener('focusout', function() {
     if (this.value === '') {
-    this.style.height = 30+"px"; // Resetujemy do początkowej wysokości tylko jeśli jest pusty
+    this.style.height = 30+"px"; 
     }
 });
 });
@@ -89,13 +89,13 @@ textarea.addEventListener("input", function() {
 
 
 function disableSockets() {
-    // Zakładam, że `socket` jest zmienną globalną lub dostępną w tym zakresie.
+    
     socket.disconnect();
 }
 
 async function UnMatch() {
     console.log("UnMatch clicked");
-    //disableSockets();
+    
     console.log("Disable sockets");
 
     const robotNameElement = document.getElementById('robot-name');
@@ -126,7 +126,7 @@ async function UnMatch() {
         if (response.ok) {
             console.log("Match Unmatched Successfully");
             window.location.href = '/user_homepage';
-            // Możesz dodać tu dodatkowe działania po pomyślnej operacji, np. przekierowanie
+            
         } else {
             console.error('Server responded with non-OK status');
         }

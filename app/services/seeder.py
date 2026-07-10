@@ -1,4 +1,4 @@
-from logging import getLogger  # JAWNY IMPORT
+from logging import getLogger
 from geoalchemy2.elements import WKTElement
 
 from app.extensions import bcrypt
@@ -8,18 +8,17 @@ from app.services.generate_robots import generate_random_robots
 
 logger = getLogger(__name__)
 
+
 def seed_data() -> None:
-    """Zasiewa bazę danych 2 użytkownikami testowymi oraz 500 robotami w ich okolicy (Warszawa i Kraków)."""
     with db_session() as db_scope:
-        # 1. GENEROWANIE UŻYTKOWNIKA I ROBOTÓW DLA WARSZAWY
+
         warszawa_user = db_scope.query(User).filter_by(username="user_warszawa").first()
         if not warszawa_user:
             logger.info("Seeding test user for Warszawa (user_warszawa)...")
             hashed_pw = bcrypt.generate_password_hash("password123").decode("utf-8")
-            
-            # Współrzędne Warszawy: Longitude 21.0122, Latitude 52.2297 (SRID 4326)
+
             geo_warszawa = WKTElement("POINT(21.0122 52.2297)", srid=4326)
-            
+
             u_warszawa = User(
                 username="user_warszawa",
                 name="Jan",
@@ -44,7 +43,7 @@ def seed_data() -> None:
             )
             c_warszawa = UserCriteria(
                 type_of_robot="all",
-                distance=10,  # Kryterium odległości ustawione na 10 km
+                distance=10,
                 employment_status="all",
                 user=u_warszawa,
             )
@@ -52,7 +51,6 @@ def seed_data() -> None:
             db_scope.add(c_warszawa)
             db_scope.flush()
 
-            # Generujemy 250 robotów wokół Warszawy
             generate_random_robots(
                 start=0,
                 number_of_robots=250,
@@ -61,17 +59,17 @@ def seed_data() -> None:
                 session=db_scope,
             )
             db_scope.commit()
-            logger.info("Successfully seeded Warszawa user and 250 surrounding robots within 10km.")
+            logger.info(
+                "Successfully seeded Warszawa user and 250 surrounding robots within 10km."
+            )
 
-        # 2. GENEROWANIE UŻYTKOWNIKA I ROBOTÓW DLA KRAKOWA
         krakow_user = db_scope.query(User).filter_by(username="user_krakow").first()
         if not krakow_user:
             logger.info("Seeding test user for Kraków (user_krakow)...")
             hashed_pw = bcrypt.generate_password_hash("password123").decode("utf-8")
-            
-            # Współrzędne Krakowa: Longitude 19.9450, Latitude 50.0647 (SRID 4326)
+
             geo_krakow = WKTElement("POINT(19.9450 50.0647)", srid=4326)
-            
+
             u_krakow = User(
                 username="user_krakow",
                 name="Anna",
@@ -96,7 +94,7 @@ def seed_data() -> None:
             )
             c_krakow = UserCriteria(
                 type_of_robot="all",
-                distance=10,  # Kryterium odległości ustawione na 10 km
+                distance=10,
                 employment_status="all",
                 user=u_krakow,
             )
@@ -104,7 +102,6 @@ def seed_data() -> None:
             db_scope.add(c_krakow)
             db_scope.flush()
 
-            # Generujemy 250 robotów wokół Krakowa
             generate_random_robots(
                 start=0,
                 number_of_robots=250,
@@ -113,4 +110,6 @@ def seed_data() -> None:
                 session=db_scope,
             )
             db_scope.commit()
-            logger.info("Successfully seeded Kraków user and 250 surrounding robots within 10km.")
+            logger.info(
+                "Successfully seeded Kraków user and 250 surrounding robots within 10km."
+            )

@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template
 from flask_login import login_required
 
-# Wszystkie importy przeniesione na samą górę pliku
+
 from app.forms.forms import AdminForm
 from app.services.database_operations import insert_into_robots_db, session_scope
 from app.services.image_upload import get_image
 
-admin_bp = Blueprint('admin', __name__)
+admin_bp = Blueprint("admin", __name__)
 
 
 @admin_bp.route("/admin_site", methods=["GET", "POST"])

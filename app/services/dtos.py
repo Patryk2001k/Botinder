@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class LocationInfoDTO:
     ip: str
@@ -18,5 +19,5 @@ class MatchResultDTO:
 @dataclass(frozen=True)
 class ChatroomContextDTO:
     matched_robots: list
-    robot_info: object  # Model UserRobot
+    robot_info: object
     messages: list

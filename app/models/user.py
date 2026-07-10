@@ -26,7 +26,6 @@ class User(UserRobotBase, UserMixin):
 class Profile(Base):
     __tablename__ = "profile"
 
-    # id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4) Z czasem podmienić wszystkie na uuid
     id = Column(Integer, primary_key=True, autoincrement=True)
     age = Column(Integer, nullable=False)
     gender = Column(

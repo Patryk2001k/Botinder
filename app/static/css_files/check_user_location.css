@@ -9,13 +9,13 @@ body, html {
     justify-content: center;
     align-items: center;
     height: 100%;
-    background-color: #181818;  /* tło kontenera */
+    background-color: #181818;  
     animation: backgroundChange 5s infinite;
 }
 
 .centered-text {
     font-size: 35px;
-    color: #fff;  /* kolor tekstu */
+    color: #fff;  
     text-align: center;
     max-width: 80%;
 }
@@ -30,7 +30,7 @@ body, html {
         background-color: #181818;
     }
     50% {
-        background-color: #555555;  /* tu możesz ustawić kolor "mocno szarawy" */
+        background-color: #555555;  
     }
     100% {
         background-color: #181818;

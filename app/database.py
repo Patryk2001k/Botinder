@@ -1,5 +1,5 @@
-from os import environ  # JAWNY IMPORT
-from logging import getLogger  # JAWNY IMPORT
+from os import environ
+from logging import getLogger
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker, scoped_session
 from sqlalchemy_utils import create_database, database_exists
@@ -8,7 +8,7 @@ logger = getLogger(__name__)
 
 Base = declarative_base()
 
-# POPRAWKA (PEP 8): Importujemy wszystkie modele na poziomie modułu pod obiektem Base
+
 from app.models.chatroom import ChatRoom
 from app.models.matches import MatchBase, RobotMatches, UnMatches, UserMatches
 from app.models.messages import UserMessage
@@ -16,8 +16,8 @@ from app.models.robots import RobotProfile, UserRobot
 from app.models.user import Profile, User, UserCriteria
 
 DB_URL = environ.get(
-    "DATABASE_URL", 
-    "postgresql://botinder_user:botinder_secure_password@db:5432/botinder"
+    "DATABASE_URL",
+    "postgresql://botinder_user:botinder_secure_password@db:5432/botinder",
 )
 
 engine = create_engine(DB_URL, echo=False)
@@ -38,6 +38,5 @@ session = db_session
 
 
 def init_db() -> None:
-    """Tworzy tabele w bazie danych (wywoływane w fabryce aplikacji)."""
     Base.metadata.create_all(bind=engine)
     logger.info("Database schemas and PostGIS extensions initialized.")

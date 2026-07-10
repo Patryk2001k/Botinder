@@ -1,19 +1,20 @@
 import os
-from time import time  # JAWNY IMPORT
-from logging import getLogger  # JAWNY IMPORT
+from time import time
+from logging import getLogger
 from threading import Lock
 import requests
 from flask import current_app
 
 logger = getLogger(__name__)
-# ... (reszta kodu bez zmian) ...
+
+
 class BotinderApiClient:
     _instance = None
     _lock = Lock()
 
     _token = None
     _token_timestamp = 0
-    _token_lifetime = 12 * 60 * 60  # Cache ważny przez 12 godzin
+    _token_lifetime = 12 * 60 * 60
 
     def __new__(cls, *args, **kwargs):
         with cls._lock:
@@ -44,13 +45,17 @@ class BotinderApiClient:
             response = requests.post(url, data=self.login_data, timeout=5)
             if response.status_code == 200:
                 token = response.json().get("access_token", "")
-                logger.info("Successfully fetched and cached new Botinder-API access token.")  # POPRAWKA
+                logger.info(
+                    "Successfully fetched and cached new Botinder-API access token."
+                )
                 return token
             else:
-                logger.error(f"Failed to authenticate with Botinder-API (Status: {response.status_code}): {response.text}")  # POPRAWKA
+                logger.error(
+                    f"Failed to authenticate with Botinder-API (Status: {response.status_code}): {response.text}"
+                )
                 return ""
         except requests.RequestException as e:
-            logger.error(f"Network error during authorization with Botinder-API: {e}")  # POPRAWKA
+            logger.error(f"Network error during authorization with Botinder-API: {e}")
             return ""
 
     def _get_headers(self) -> dict:
@@ -63,12 +68,16 @@ class BotinderApiClient:
             response = requests.get(url, headers=self._get_headers(), timeout=5)
             if response.status_code == 200:
                 return response.json()
-            logger.error(f"API get_coordinates returned error (Status: {response.status_code}): {response.text}")  # POPRAWKA
+            logger.error(
+                f"API get_coordinates returned error (Status: {response.status_code}): {response.text}"
+            )
         except requests.RequestException as e:
-            logger.error(f"Network connection failed in API get_coordinates: {e}")  # POPRAWKA
+            logger.error(f"Network connection failed in API get_coordinates: {e}")
         return {}
 
-    def get_distance(self, first_lat: float, first_lon: float, second_lat: float, second_lon: float) -> dict:
+    def get_distance(
+        self, first_lat: float, first_lon: float, second_lat: float, second_lon: float
+    ) -> dict:
         url = f"{self.base_url}/distance/"
         params = {
             "first_lat": first_lat,
@@ -77,10 +86,14 @@ class BotinderApiClient:
             "second_lon": second_lon,
         }
         try:
-            response = requests.get(url, headers=self._get_headers(), params=params, timeout=5)
+            response = requests.get(
+                url, headers=self._get_headers(), params=params, timeout=5
+            )
             if response.status_code == 200:
                 return response.json()
-            logger.error(f"API get_distance returned error (Status: {response.status_code}): {response.text}")  # POPRAWKA
+            logger.error(
+                f"API get_distance returned error (Status: {response.status_code}): {response.text}"
+            )
         except requests.RequestException as e:
-            logger.error(f"Network connection failed in API get_distance: {e}")  # POPRAWKA
+            logger.error(f"Network connection failed in API get_distance: {e}")
         return {}

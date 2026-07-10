@@ -6,7 +6,7 @@ from geoalchemy2.shape import to_shape
 from sqlalchemy import and_, asc, exists, not_, or_
 from sqlalchemy.orm import aliased, joinedload
 
-# POPRAWKA (PEP 8): Prawidłowy import bcrypt na samej górze pliku
+
 from app.extensions import bcrypt
 from app.database import Session, engine, session
 from app.models.chatroom import ChatRoom
@@ -41,7 +41,7 @@ class UserObject:
         users = session.query(User).all()
         password_exists = False
         for user in users:
-            # Używamy obiektu bcrypt zaimportowanego na górze pliku
+
             if bcrypt.check_password_hash(user.password, password):
                 password_exists = True
                 break
@@ -354,13 +354,17 @@ def delete_chatroom(session, chatroom_id):
 
 
 def delete_matched_pair(session, user_name, robot_name):
-    user = session.query(User).filter(
-        or_(User.username == user_name, User.name == user_name)
-    ).first()
+    user = (
+        session.query(User)
+        .filter(or_(User.username == user_name, User.name == user_name))
+        .first()
+    )
     robot = session.query(UserRobot).filter(UserRobot.name == robot_name).first()
 
     if not user or not robot:
-        warning(f"Could not find user '{user_name}' or robot '{robot_name}' during unmatch operation.")
+        warning(
+            f"Could not find user '{user_name}' or robot '{robot_name}' during unmatch operation."
+        )
         return
 
     user_match = (
@@ -379,7 +383,9 @@ def delete_matched_pair(session, user_name, robot_name):
         session.delete(user_match)
         session.delete(robot_match)
         session.commit()
-        info(f"Successfully unmatched pair: User '{user_name}' and Robot '{robot_name}'.")
+        info(
+            f"Successfully unmatched pair: User '{user_name}' and Robot '{robot_name}'."
+        )
     else:
         warning(
             f"Match record not found in database for User '{user_name}' and Robot '{robot_name}' during unmatch operation."
