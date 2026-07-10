@@ -28,7 +28,3 @@ class Config:
     
     # Redis i Huey
     REDIS_URL = environ.get("REDIS_URL", "redis://redis:6379/0")
-    
-    # Botinder API
-    BOTINDER_API_URL = environ.get("BOTINDER_API_URL", "http://127.0.0.1:8000")
-    BOTINDER_API_LOGIN_DATA = {"username": "botinder", "password": "botinderpassword"}

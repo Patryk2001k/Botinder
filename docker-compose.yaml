@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # 1. Baza danych PostgreSQL z PostGIS (wymagane dla Flask i GeoAlchemy2)
+  # 1. Baza danych PostgreSQL z PostGIS
   db:
     image: postgis/postgis:15-3.4
     container_name: botinder_db
@@ -19,60 +19,43 @@ services:
       timeout: 5s
       retries: 5
 
-  # 2. Redis (serwer cache i kolejka dla Huey)
+  # 2. Redis
   redis:
     image: redis:7-alpine
     container_name: botinder_redis
     ports:
       - "6379:6379"
 
-  # 3. Mikrousługa FastAPI (Botinder-API)
-  botinder-api:
-    build:
-      context: ./Botinder-API
-    container_name: botinder_api
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://botinder_user:botinder_secure_password@db:5432/botinder_api
-    depends_on:
-      db:
-        condition: service_healthy
-
-  # 4. Główna aplikacja Flask (Botinder)
+  # 3. Główna aplikacja Flask (Botinder)
   botinder-web:
     build:
-      context: ./Botinder
+      context: .  # Budowanie z katalogu głównego
     container_name: botinder_web
     ports:
       - "5000:5000"
     environment:
-      - DATABASE_URL=postgresql://botinder_user:botinder_secure_password@db:5432/botinder_web
+      - DATABASE_URL=postgresql://botinder_user:botinder_secure_password@db:5432/botinder
       - REDIS_URL=redis://redis:6379/0
-      - BOTINDER_API_URL=http://botinder-api:8000
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_started
-      botinder-api:
-        condition: service_started
 
-  # 5. Konsument zadań w tle (Huey worker dla Flaska)
+  # 4. Konsument zadań w tle (Huey worker dla Flaska)
   huey-worker:
     build:
-      context: ./Botinder
+      context: .  # Budowanie z katalogu głównego
     container_name: botinder_huey_worker
     command: python -m huey.bin.huey_consumer app.extensions.huey
     environment:
-      - DATABASE_URL=postgresql://botinder_user:botinder_secure_password@db:5432/botinder_web
+      - DATABASE_URL=postgresql://botinder_user:botinder_secure_password@db:5432/botinder
       - REDIS_URL=redis://redis:6379/0
-      - BOTINDER_API_URL=http://botinder-api:8000
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_started
-        
+
 volumes:
   postgres_data:

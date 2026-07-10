@@ -1,16 +1,13 @@
-from json import load  # JAWNY IMPORT zamiast import json
-from logging import getLogger  # JAWNY IMPORT zamiast import logging
+from json import load  # JAWNY IMPORT
+from logging import getLogger  # JAWNY IMPORT
+from pathlib import Path
 import country_converter as coco
 from geopy.distance import geodesic
+from geopy.geocoders import Nominatim  # POPRAWKA: Importujemy Nominatim lokalnie
 from ip2geotools.databases.noncommercial import DbIpCity
 from flask import has_request_context, request, current_app
-from pathlib import Path
 
-from app.services.dtos import LocationInfoDTO  # IMPORT DTO
-from app.services.API_requests.requests import (
-    get_botinderAPI_coordinates,
-    get_botinderAPI_distance
-)
+from app.services.dtos import LocationInfoDTO
 
 logger = getLogger(__name__)
 
@@ -19,7 +16,6 @@ class GeolocalizationService:
 
     @classmethod
     def _load_cities(cls) -> dict:
-        """Ładuje bazę miast z folderu app/data/ w sposób leniwy."""
         if cls._cities_cache is None:
             current_dir = Path(__file__).resolve().parent.parent
             cities_path = current_dir / "data" / "cities.json"
@@ -29,7 +25,7 @@ class GeolocalizationService:
                 
             try:
                 with open(cities_path, "r", encoding="utf-8") as f:
-                    cls._cities_cache = load(f)  # JAWNE UŻYCIE load()
+                    cls._cities_cache = load(f)
                 logger.info(f"Successfully loaded cities database from: {cities_path}")
             except Exception as e:
                 logger.error(f"Failed to load cities file from path {cities_path}: {e}", exc_info=True)
@@ -45,7 +41,6 @@ class GeolocalizationService:
 
     @classmethod
     def get_location_info(cls) -> LocationInfoDTO:
-        """Pobiera informacje o lokalizacji na podstawie adresu IP i zwraca je jako LocationInfoDTO."""
         ip_address = cls.get_ip()
         
         if (not ip_address or 
@@ -57,7 +52,6 @@ class GeolocalizationService:
             
         try:
             response = DbIpCity.get(ip_address, api_key="free")
-            # Zwracamy obiekt DTO zamiast słownika
             return LocationInfoDTO(
                 ip=ip_address,
                 city=response.city,
@@ -77,7 +71,7 @@ class GeolocalizationService:
     def get_cities(cls) -> list[str]:
         try:
             location = cls.get_location_info()
-            country_code = location.country  # Dostęp do atrybutu obiektu DTO
+            country_code = location.country
             
             cities_db = cls._load_cities()
             if not country_code or country_code not in cities_db:
@@ -91,34 +85,35 @@ class GeolocalizationService:
 
     @classmethod
     def get_coordinates(cls, city_name: str) -> list[float]:
+        """Konwertuje nazwę miasta na współrzędne geograficzne NATYWNIE przy użyciu geopy."""
+        # Unikalny User-Agent chroni nas przed błędem 403 z serwerów OSM
+        geolocator = Nominatim(user_agent="Botinder_App_Decoupled_Monolith_Client_2026")
         try:
-            response = get_botinderAPI_coordinates(city_name)
-            return [response["latitude"], response["longitude"]]
+            location = geolocator.geocode(city_name, timeout=10)
+            if location:
+                logger.info(f"Successfully geocoded '{city_name}' to [{location.latitude}, {location.longitude}] natively.")
+                return [location.latitude, location.longitude]
+            logger.warning(f"City '{city_name}' not found by native geocoder. Using default Warsaw coordinates.")
         except Exception as e:
-            logger.warning(f"Failed to fetch coordinates for {city_name} from API (falling back to Warsaw): {e}")
-            return [52.2297, 21.0122]
+            logger.error(f"Error during native geocoding of city '{city_name}': {e}", exc_info=True)
+        return [52.2297, 21.0122]  # Fallback: Warszawa
 
     @classmethod
     def calculate_distance(cls, first_lat: float, first_lon: float, second_lat: float, second_lon: float) -> int:
-        params = {
-            "first_lat": first_lat,
-            "first_lon": first_lon,
-            "second_lat": second_lat,
-            "second_lon": second_lon,
-        }
+        """Oblicza odległość geodezyjną w kilometrach NATYWNIE przy użyciu geopy."""
         try:
-            response = get_botinderAPI_distance(params)
-            return response.get("distance")
-        except Exception as e:
-            logger.warning(f"Failed to fetch distance from API (falling back to local geodesic calculation): {e}")
             first_cords = (first_lat, first_lon)
             second_cords = (second_lat, second_lon)
-            return int(geodesic(first_cords, second_cords).km)
+            dist = int(geodesic(first_cords, second_cords).km)
+            return dist
+        except Exception as e:
+            logger.error(f"Error during native distance calculation: {e}", exc_info=True)
+            return 0
 
     @classmethod
     def country_name_to_code(cls) -> str:
         try:
             country_name = cls.get_location_info()
-            return coco.convert(names=country_name.country, to="ISO2")  # Atrybut obiektu DTO
+            return coco.convert(names=country_name.country, to="ISO2")
         except Exception:
             return "PL"
