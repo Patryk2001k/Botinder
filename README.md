@@ -2,7 +2,7 @@
 
 Botinder is a tongue-in-cheek web application whose main purpose is connecting humans with robots, inspired by popular dating platforms. The project has undergone a thorough code refactoring in accordance with Clean Code principles and has been fully containerized using Docker, merging the legacy web application and a dedicated API module into a single, cohesive environment (Monorepo).
 
-## Concept and Project Goals
+# Concept and Project Goals
 
 The project was created as a humorous simulation of a dating app for humans and machines. The main features of the system include:
 - User registration, login, and profile management (including profile picture uploads).
@@ -28,7 +28,7 @@ Handles the user interface, sessions, authentication, and the entire relational 
 
 ---
 
-## How to Run (Docker Compose)
+# How to Run (Docker Compose)
 
 Thanks to full containerization, launching the entire environment along with the database and accompanying services comes down to executing basic commands. There is no need for local installation of libraries from the requirements.txt file or manual database configuration.
 
@@ -52,7 +52,7 @@ docker-compose up --build
 ```
 ---
 
-## Login Credentials and Test Environment
+# Login Credentials and Test Environment
 
 After successfully starting the containers and waiting about 15-20 seconds for table initialization and automatic data seeding, the main application becomes available at:
 http://localhost:5000
